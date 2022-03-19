@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WebGL 2D CAD</title>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body onload="load()">
+        <h2 class="center">WebGL 3D CAD</h2>
+        <p class="center"><i>Choose your object type and draw it on canvas above</i></p>
+        <section class="center">
+            <button id="helpBtn">Help</button>
+            <input type="button" id="btnReset" value="Reset" onclick="reset()">
+            <br/>
+            <label for="cubRotX">Cube Horizontal Rotation</label>
+            <input type="range" id="cubeRotX" name="cubeRotX" min="-360" max="360" onchange="changeCube()">
+            <label for="cubRotY">Cube Vertical Rotation</label>
+            <input type="range" id="cubeRotY" name="cubeRotY" min="-360" max="360" onchange="changeCube()">
+            <label for="cubScale">Cube Scale</label>
+            <input type="range" id="cubeScale" name="cubeScale" min="1" max="10" onchange="changeCube()" value="10">
+            <br/>                  
+            <input type="color" id="color_picker" onchange="getColor()">
+        </section>
+        <br/>
+        <section class="center">
+            <canvas id="canvas-surface" width="600" height="600">
+            Your browser does not support HTML5
+            </canvas>
+        </section>
+        <section class="center">
+            <input type="text" id="export_file" placeholder="Enter file name">
+            <input type="button" value="Export" onclick="exportFile()">
+            <input type="file" id="import_file" accept=".json">
+            <input type="button" value="Import" onclick="importFile()">
+        </section>
+
+        <script src="app.js"></script>
+        <script src="util.js"></script>
+        <script src="file_handler.js"></script>
+    
+        <script src="kubus.js"></script>
+    </body>
+</html>
