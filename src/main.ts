@@ -1,8 +1,12 @@
+import { Control } from './control';
 import './style.css';
+import { WebGL } from './webgl';
 
-const app = document.querySelector<HTMLDivElement>('#app')!;
-
-app.innerHTML = `
-  <h1>Hello Vite!</h1>
-  <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
-`;
+// Program State
+const canvas = document.getElementById('canvas-object') as HTMLCanvasElement;
+const gl = canvas.getContext('webgl');
+if (!gl) {
+    alert('WebGL is not supported in your machine/browser.');
+}
+const webGL: WebGL = new WebGL(gl);
+const control: Control = new Control((e: Event) => {});
