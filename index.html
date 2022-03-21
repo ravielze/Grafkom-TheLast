@@ -1,13 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
+
+    <head>
+        <title>Hollow Object</title>
+    </head>
+</head>
+
+<body class="min-h-screen font-mono bg-gray-900">
+    <div class="mb-4 text-center py-5 w-auto h-max">
+        <h1 class="font-bold text-cyan-200 text-6xl">2nd Project - Hollow Object</h1>
+    </div>
+    <div>
+        <div class="flex pb-10 justify-center w-full">
+            <canvas id="canvas-object" class="shadow-lg bg-gray-800 rounded-xl w-4/6"></canvas>
+        </div>
+    </div>
+    <div class="flex justify-center text-cyan-400">
+        <div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="near">near-plane</label>
+                <input id="near" type="range" min="1" max="50" value="1" />
+            </div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="far">far-plane&nbsp;</label>
+                <input id="far" type="range" min="1" max="50" value="50" />
+            </div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="camdist">cam-radius</label>
+                <input id="camdist" type="range" min="0" max="10" step="0.05" value="2" />
+            </div>
+        </div>
+        <div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="x-rotation">x-rotation</label>
+                <input id="x-rotation" type="range" min="-180" max="180" value="0" />
+            </div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="y-rotation">y-rotation</label>
+                <input id="y-rotation" type="range" min="-90" max="90" value="0" />
+            </div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="z-rotation">z-rotation</label>
+                <input id="z-rotation" type="range" min="-180" max="180" value="0" />
+            </div>
+        </div>
+        <div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="x-scale">x-scale</label>
+                <input id="x-scale" type="range" min="0.2" max="2" step="0.05" value="1" />
+            </div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="y-scale">y-scale</label>
+                <input id="y-scale" type="range" min="0.2" max="2" step="0.05" value="1" />
+            </div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="z-scale">z-scale</label>
+                <input id="z-scale" type="range" min="0.2" max="2" step="0.05" value="1" />
+            </div>
+        </div>
+        <div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="x-translation">x-translation</label>
+                <input id="x-translation" type="range" min="-10" max="10" step="0.05" value="0" />
+            </div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="y-translation">y-translation</label>
+                <input id="y-translation" type="range" min="-10" max="10" step="0.05" value="0" />
+            </div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="z-translation">z-translation</label>
+                <input id="z-translation" type="range" min="-10" max="10" step="0.05" value="0" />
+            </div>
+        </div>
+        <div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="x-camrot">x-cam-rot</label>
+                <input id="x-camrot" type="range" min="-90" max="90" step="1" value="0" />
+            </div>
+            <div class="flex items-center space-x-2 p-1">
+                <label for="y-camrot">y-cam-rot</label>
+                <input id="y-camrot" type="range" min="-180" max="180" step="1" value="0" />
+            </div>
+        </div>
+        <div class="pl-3">
+            <div class="flex items-center space-x-2 p-1 justify-center">
+                <button class="rounded py-1 px-2 text-white bg-cyan-600 hover:bg-cyan-500" id="model1">
+                    Model 1
+                </button>
+            </div>
+            <div class="flex items-center space-x-2 p-1 justify-center">
+                <button class="rounded py-1 px-2 text-white bg-cyan-600 hover:bg-cyan-500" id="model2">
+                    Model 2
+                </button>
+            </div>
+            <div class="flex items-center space-x-2 p-1 justify-center">
+                <button class="rounded py-1 px-2 text-white bg-cyan-600 hover:bg-cyan-500" id="model3">
+                    Model 3
+                </button>
+            </div>
+        </div>
+        <div class="pl-5">
+            <div class="flex items-center space-x-2 p-1 justify-center">
+                <button class="rounded py-1 px-2 text-white bg-green-600 hover:bg-green-500" id="perspective">
+                    Perspective
+                </button>
+            </div>
+            <div class="flex items-center space-x-2 p-1 justify-center">
+                <button class="rounded py-1 px-2 text-white bg-green-600 hover:bg-green-500" id="oblique">
+                    Oblique
+                </button>
+            </div>
+            <div class="flex items-center space-x-2 p-1 justify-center">
+                <button class="rounded py-1 px-2 text-white bg-green-600 hover:bg-green-500" id="orthographic">
+                    Orthographic
+                </button>
+            </div>
+        </div>
+        <div class="pl-3">
+            <div class="flex items-center space-x-2 p-1 pt-4 justify-center">
+                <button class="rounded py-1 px-2 text-white bg-gray-600 hover:bg-gray-500" id="toggle-shading-btn">
+                    Toggle Shading
+                </button>
+            </div>
+            <div class="flex items-center space-x-2 p-1 pt-5 justify-center">
+                <button class="rounded py-1 px-2 text-white bg-pink-600 hover:bg-pink-500" id="reset-btn">
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
-  </body>
+</body>
+
 </html>

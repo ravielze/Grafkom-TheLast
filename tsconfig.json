@@ -18,7 +18,8 @@
         "noImplicitReturns": true,
         "types": [
             "vite/client"
-        ]
+        ],
+        "alwaysStrict": true,
     },
     "include": [
         "src"
