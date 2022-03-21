@@ -9,4 +9,10 @@ interface Vec2 {
     y: number;
 }
 
-export { Vec3, Vec2 };
+enum ProjectionMode {
+    Perspective = 0,
+    Orthographic = 1,
+    Oblique = 2,
+}
+
+export { Vec3, Vec2, ProjectionMode };
