@@ -1,4 +1,5 @@
-import { Vec2, Vec3 } from '../types';
+import { ModelManager } from '../model';
+import { ProjectionMode, Vec2, Vec3 } from '../types';
 
 export class Control {
     private static readonly ROTATION_DEFAULT_VALUE: number = 0;
@@ -24,6 +25,7 @@ export class Control {
         z: Control.TRANSLATION_DEFAULT_VALUE,
     };
     public useShader: boolean = true;
+    public projectionMode: ProjectionMode = ProjectionMode.Perspective;
 
     public cameraRotation: Vec2 = {
         x: Control.ROTATION_DEFAULT_VALUE,
@@ -50,23 +52,42 @@ export class Control {
         'far',
     ];
 
-    constructor(private readonly onInputChanged: (e: Event) => void) {
+    private static readonly PROJECTION_BUTTON_MAPS: { [key: string]: ProjectionMode } = {
+        oblique: ProjectionMode.Oblique,
+        perspective: ProjectionMode.Perspective,
+        orthographic: ProjectionMode.Orthographic,
+    };
+    public onInputChanged: (e: Event) => void = (): void => {};
+
+    constructor() {
         this.update();
         //TODO button model
-        //TODO camera projection
+
+        this.getElement('model-file').addEventListener('change', this.onModelFileLoaded.bind(this));
+
         this.getElement('reset-btn').addEventListener(
             'click',
             this.onResetButtonClicked.bind(this)
         );
+
         this.getElement('toggle-shading-btn').addEventListener(
             'click',
             this.onToggleShadersButtonClicked.bind(this)
         );
+
         Control.ELEMENT_IDS.forEach((id) => {
             this.getElement(id).addEventListener('input', (ev: Event) => {
                 this.update();
-                onInputChanged(ev);
+                this.onInputChanged(ev);
             });
+        });
+
+        Object.entries(Control.PROJECTION_BUTTON_MAPS).forEach((each) => {
+            const [id, mode] = each;
+            this.getElement(id).addEventListener(
+                'click',
+                this.onProjectionModeButtonClicked(mode).bind(this)
+            );
         });
     }
 
@@ -85,6 +106,51 @@ export class Control {
         this.cameraDistance = this.getNumber('camdist');
         this.near = this.getNumber('near');
         this.far = this.getNumber('far');
+    }
+
+    private onModelFileLoaded(): void {
+        const fileInput = this.getElement('model-file');
+
+        if (!fileInput.files) {
+            return;
+        }
+
+        const data = fileInput.files[0];
+
+        if (!data) {
+            alert('File is not found.');
+            return;
+        }
+
+        const reader = new FileReader();
+        const fileName = data.name.replace('.json', '');
+        reader.onload = (e) => {
+            var result: any = {};
+            try {
+                result = JSON.parse((e.target as FileReader).result as string);
+            } catch (e) {
+                alert('Failed to parse file as JSON.');
+                return;
+            }
+            if (!result) {
+                return;
+            }
+
+            const loaded = ModelManager.loadFromFile(fileName, result);
+            if (loaded) {
+                this.onInputChanged(e);
+            }
+        };
+
+        reader.readAsText(data);
+    }
+
+    private onProjectionModeButtonClicked(mode: ProjectionMode): (e: MouseEvent) => void {
+        return (e: MouseEvent): void => {
+            this.projectionMode = mode;
+            this.onInputChanged(e);
+            e.preventDefault();
+        };
     }
 
     private onToggleShadersButtonClicked(e: MouseEvent): void {

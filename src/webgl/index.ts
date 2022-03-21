@@ -1,21 +1,20 @@
 import BodyVertexShader from './shaders/body-vertex-shader.glsl';
 import BodyFragmentShader from './shaders/body-fragment-shader.glsl';
-import WireVertexShader from './shaders/wire-vertex-shader.glsl';
-import WireFragmentShader from './shaders/wire-fragment-shader.glsl';
+import { Drawer } from './drawer';
+import Matrix from '../utils/matrix';
+import { Control } from '../control';
+import { ModelManager } from '../model';
 
 export class WebGL {
     public gl: WebGLRenderingContext | null = null;
     public program: WebGLProgram | null = null;
-    public wireProgram: WebGLProgram | null = null;
 
     public vbo: WebGLBuffer | null = null;
     public wireVbo: WebGLBuffer | null = null;
     public elementVbo: WebGLBuffer | null = null;
 
     public matrixLocation: WebGLUniformLocation | null = null;
-    public wireMatrixLocation: WebGLUniformLocation | null = null;
     public projectionMatrixLocation: WebGLUniformLocation | null = null;
-    public wireProjectionMatrixLocation: WebGLUniformLocation | null = null;
     public normalMatrixLocation: WebGLUniformLocation | null = null;
 
     public mode: WebGLUniformLocation | null = null;
@@ -28,14 +27,26 @@ export class WebGL {
     public specularColor: WebGLUniformLocation | null = null;
     public lightPos: WebGLUniformLocation | null = null;
     public shadingModeLocation: WebGLUniformLocation | null = null;
+    public colorOffset: number = 0;
 
-    constructor(gl: WebGLRenderingContext | null) {
+    constructor(
+        gl: WebGLRenderingContext | null,
+        private drawer: Drawer,
+        private readonly control: Control
+    ) {
         var glx = gl as WebGLRenderingContext;
         this.gl = glx;
 
         glx.enable(glx.DEPTH_TEST);
         glx.clearColor(0.0, 0.0, 0.0, 0.0);
+    }
+
+    public start(): void {
+        this.loadModel();
         this.initShaders();
+        this.drawer.calculateTransformation();
+        this.drawer.calculateCameraProjection();
+        this.draw();
     }
 
     private initShaders(): void {
@@ -72,31 +83,85 @@ export class WebGL {
         this.specularColor = gl.getUniformLocation(this.program, 'specularColor');
         this.lightPos = gl.getUniformLocation(this.program, 'lightPos');
         this.normalMatrixLocation = gl.getUniformLocation(this.program, 'normalMat');
+        this.gl = gl;
+    }
 
-        // Wire Shaders
-        const wireVertexShader = gl.createShader(gl.VERTEX_SHADER) as WebGLShader;
-        gl.shaderSource(wireVertexShader, WireVertexShader);
-        gl.compileShader(wireVertexShader);
+    public loadModel(): void {
+        const gl = this.gl as WebGLRenderingContext;
+        const model = ModelManager.getCurrentModel();
+        if (!model) {
+            return;
+        }
 
-        const wireFragmentShader = gl.createShader(gl.FRAGMENT_SHADER) as WebGLShader;
-        gl.shaderSource(wireFragmentShader, WireFragmentShader);
-        gl.compileShader(wireFragmentShader);
-
-        this.wireProgram = gl.createProgram() as WebGLProgram;
-        gl.attachShader(this.wireProgram, wireVertexShader);
-        gl.attachShader(this.wireProgram, wireFragmentShader);
-
-        this.wireProgram = gl.createProgram() as WebGLProgram;
-        gl.attachShader(this.wireProgram, wireVertexShader);
-        gl.attachShader(this.wireProgram, wireFragmentShader);
-
-        gl.bindAttribLocation(this.wireProgram, 0, 'a_position');
-        gl.linkProgram(this.wireProgram);
-        this.wireMatrixLocation = gl.getUniformLocation(this.wireProgram, 'u_matrix');
-        this.wireProjectionMatrixLocation = gl.getUniformLocation(
-            this.wireProgram,
-            'u_proj_matrix'
+        this.vbo = gl.createBuffer() as WebGLBuffer;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+        gl.bufferData(
+            gl.ARRAY_BUFFER,
+            model.positions.byteLength + model.colors.byteLength,
+            gl.STATIC_DRAW
         );
+        this.colorOffset = model.positions.byteLength;
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, model.positions);
+        gl.bufferSubData(gl.ARRAY_BUFFER, this.colorOffset, model.colors);
+
+        this.elementVbo = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.elementVbo);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, model.indices, gl.STATIC_DRAW);
+
+        this.gl = gl;
+    }
+
+    public draw(): void {
+        const gl = this.gl as WebGLRenderingContext;
+
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.enable(gl.DEPTH_TEST);
+        gl.useProgram(this.program);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+
+        // Retrieve Positionns
+        gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(0);
+
+        // Retrieve Colors
+        gl.vertexAttribPointer(2, 4, gl.FLOAT, false, 0, this.colorOffset);
+        gl.enableVertexAttribArray(2);
+
+        gl.uniformMatrix4fv(this.matrixLocation, false, new Float32Array(this.drawer.matrix));
+        gl.uniformMatrix4fv(
+            this.projectionMatrixLocation,
+            false,
+            new Float32Array(this.drawer.projMatrix)
+        );
+
+        const inversedMatrix = Matrix.inverse(this.drawer.matrix);
+        gl.uniformMatrix4fv(
+            this.normalMatrixLocation,
+            false,
+            new Float32Array(Matrix.transpose(inversedMatrix))
+        );
+
+        gl.uniform1i(this.mode, 1);
+        gl.uniform1i(this.shadingModeLocation, this.control.useShader ? 1 : 0);
+        gl.uniform1f(this.ka, 1);
+        gl.uniform1f(this.kd, 1);
+        gl.uniform1f(this.ks, 1);
+
+        this.gl = gl;
+        const model = ModelManager.getCurrentModel();
+        if (!model) {
+            return;
+        }
+
+        gl.uniform1f(this.shineValue, model.material.shininess);
+        gl.uniform3fv(this.ambientColor, new Float32Array(model.material.ambient));
+        gl.uniform3fv(this.diffuseColor, new Float32Array(model.material.diffuse));
+        gl.uniform3fv(this.specularColor, new Float32Array(model.material.specular));
+        gl.uniform3fv(this.lightPos, new Float32Array([0, 3, 0]));
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.elementVbo);
+        gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT, 0);
 
         this.gl = gl;
     }

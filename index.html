@@ -17,7 +17,7 @@
     </div>
     <div>
         <div class="flex pb-10 justify-center w-full">
-            <canvas id="canvas-object" class="shadow-lg bg-gray-800 rounded-xl w-4/6"></canvas>
+            <canvas id="canvas-object" class="shadow-lg bg-gray-800 rounded-xl"></canvas>
         </div>
     </div>
     <div class="flex justify-center text-cyan-400">
@@ -28,7 +28,7 @@
             </div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="far">far-plane&nbsp;</label>
-                <input id="far" type="range" min="1" max="50" value="50" />
+                <input id="far" type="range" min="1.05" max="50" value="50" />
             </div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="camdist">cam-radius</label>
@@ -38,43 +38,43 @@
         <div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="x-rotation">x-rotation</label>
-                <input id="x-rotation" type="range" min="-180" max="180" value="0" />
+                <input id="x-rotation" type="range" min="-180" max="180" value="0" step="5" />
             </div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="y-rotation">y-rotation</label>
-                <input id="y-rotation" type="range" min="-90" max="90" value="0" />
+                <input id="y-rotation" type="range" min="-90" max="90" value="0" step="5" />
             </div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="z-rotation">z-rotation</label>
-                <input id="z-rotation" type="range" min="-180" max="180" value="0" />
+                <input id="z-rotation" type="range" min="-180" max="180" value="0" step="5" />
             </div>
         </div>
         <div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="x-scale">x-scale</label>
-                <input id="x-scale" type="range" min="0.2" max="2" step="0.05" value="1" />
+                <input id="x-scale" type="range" min="0.1" max="3" step="0.1" value="1" />
             </div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="y-scale">y-scale</label>
-                <input id="y-scale" type="range" min="0.2" max="2" step="0.05" value="1" />
+                <input id="y-scale" type="range" min="0.1" max="3" step="0.1" value="1" />
             </div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="z-scale">z-scale</label>
-                <input id="z-scale" type="range" min="0.2" max="2" step="0.05" value="1" />
+                <input id="z-scale" type="range" min="0.1" max="3" step="0.1" value="1" />
             </div>
         </div>
         <div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="x-translation">x-translation</label>
-                <input id="x-translation" type="range" min="-10" max="10" step="0.05" value="0" />
+                <input id="x-translation" type="range" min="-3" max="3" step="0.1" value="0" />
             </div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="y-translation">y-translation</label>
-                <input id="y-translation" type="range" min="-10" max="10" step="0.05" value="0" />
+                <input id="y-translation" type="range" min="-3" max="3" step="0.1" value="0" />
             </div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="z-translation">z-translation</label>
-                <input id="z-translation" type="range" min="-10" max="10" step="0.05" value="0" />
+                <input id="z-translation" type="range" min="-2" max="2" step="0.1" value="0" />
             </div>
         </div>
         <div>
@@ -122,15 +122,33 @@
             </div>
         </div>
         <div class="pl-3">
-            <div class="flex items-center space-x-2 p-1 pt-4 justify-center">
+            <div class="flex items-center space-x-2 p-1 justify-center">
                 <button class="rounded py-1 px-2 text-white bg-gray-600 hover:bg-gray-500" id="toggle-shading-btn">
                     Toggle Shading
                 </button>
             </div>
-            <div class="flex items-center space-x-2 p-1 pt-5 justify-center">
+            <div class="flex items-center space-x-2 p-1 justify-center">
                 <button class="rounded py-1 px-2 text-white bg-pink-600 hover:bg-pink-500" id="reset-btn">
                     Reset
                 </button>
+            </div>
+            <div class="flex items-center space-x-2 p-1 justify-center">
+                <button class="rounded py-1 px-2 text-gray-500 bg-amber-400 hover:bg-amber-300" id="download-btn">
+                    Download
+                </button>
+            </div>
+        </div>
+        <div>
+            <div class="flex items-center space-x-2 p-1 pl-3 pt-5 justify-center">
+                <label
+                    class="w-48 flex flex-col items-center px-1 py-3 bg-cyan-600 text-white rounded-lg shadow-lg tracking-wide uppercase cursor-pointer hover:bg-cyan-700 hover:text-cyan-200">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                    </svg>
+                    <span class="mt-2 text-base leading-normal">Select a file</span>
+                    <input type="file" class="hidden" id="model-file" />
+                </label>
             </div>
         </div>
     </div>

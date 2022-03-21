@@ -4,11 +4,15 @@ export type ArrayVector = number[];
 
 export default class Vector {
     public static add(v1: Vector3, v2: Vector3): Vector3 {
-        return v1.map((val, idx) => val + v2[idx]);
+        return v2.map((val, idx) => {
+            return val + v1[idx];
+        });
     }
 
     public static subtract(v1: Vector3, v2: Vector3): Vector3 {
-        return v1.map((val, idx) => val - v2[idx]);
+        return v2.map((val, idx) => {
+            return val + v1[idx];
+        });
     }
 
     public static normalize(v: Vector3): Vector3 {
