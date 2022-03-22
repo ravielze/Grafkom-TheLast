@@ -56,7 +56,7 @@
             </div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="y-rotation">y-rotation</label>
-                <input id="y-rotation" type="range" min="-90" max="90" value="0" step="5" />
+                <input id="y-rotation" type="range" min="-180" max="180" value="0" step="5" />
             </div>
             <div class="flex items-center space-x-2 p-1">
                 <label for="z-rotation">z-rotation</label>
@@ -99,6 +99,15 @@
             <div class="flex items-center space-x-2 p-1">
                 <label for="y-camrot">y-cam-rot</label>
                 <input id="y-camrot" type="range" min="-180" max="180" step="1" value="0" />
+            </div>
+            <div class="flex items-center space-x-2 p-1">
+                <label>auto-rotate</label>
+                <label for="auto-rotation-x">x</label>
+                <input id="auto-rotation-x" type="checkbox" checked />
+                <label for="auto-rotation-y">y</label>
+                <input id="auto-rotation-y" type="checkbox" checked />
+                <label for="auto-rotation-z">z</label>
+                <input id="auto-rotation-z" type="checkbox" checked />
             </div>
         </div>
         <div class="pl-3" id="model-container">

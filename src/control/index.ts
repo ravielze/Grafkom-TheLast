@@ -1,9 +1,10 @@
 import { ModelManager } from '../model';
-import { ProjectionMode, Vec2, Vec3 } from '../types';
+import { ProjectionMode, Vec2, Vec3, VecBool3 } from '../types';
+import { AnimationControl } from './animation';
 import ModelControl from './model-control';
 
 export class Control {
-    private static readonly ROTATION_DEFAULT_VALUE: number = 0;
+    public static readonly ROTATION_DEFAULT_VALUE: number = 0;
     private static readonly SCALE_DEFAULT_VALUE: number = 1;
     private static readonly TRANSLATION_DEFAULT_VALUE: number = 0;
     private static readonly CAMERA_DISTANCE_DEFAULT_VALUE: number = 2;
@@ -38,10 +39,18 @@ export class Control {
         x: Control.ROTATION_DEFAULT_VALUE,
         y: Control.ROTATION_DEFAULT_VALUE,
     };
+
+    public autoRotation: VecBool3 = {
+        x: true,
+        y: true,
+        z: true,
+    };
     public cameraDistance: number = Control.CAMERA_DISTANCE_DEFAULT_VALUE;
     public near: number = Control.NEAR_DEFAULT_VALUE;
     public far: number = Control.FAR_DEFAULT_VALUE;
+
     private readonly modelControl: ModelControl = new ModelControl(this);
+    public readonly animation: AnimationControl = new AnimationControl(this);
 
     private static readonly ELEMENT_IDS: string[] = [
         'x-rotation',
@@ -63,18 +72,24 @@ export class Control {
         'z-light',
     ];
 
+    private static readonly CHECKBOX_IDS: string[] = [
+        'auto-rotation-x',
+        'auto-rotation-y',
+        'auto-rotation-z',
+    ];
+
     private static readonly PROJECTION_BUTTON_MAPS: { [key: string]: ProjectionMode } = {
         oblique: ProjectionMode.Oblique,
         perspective: ProjectionMode.Perspective,
         orthographic: ProjectionMode.Orthographic,
     };
-    public onInputChanged: (e: Event) => void = (): void => {};
+    public onInputChanged: () => void = (): void => {};
 
     constructor() {
         this.update();
-        this.getElement('model-btn').addEventListener('click', (e: MouseEvent) => {
+        this.getElement('model-btn').addEventListener('click', () => {
             ModelManager.load('cube');
-            this.onInputChanged(e);
+            this.onInputChanged();
         });
 
         this.getElement('model-file').addEventListener('change', this.onModelFileLoaded.bind(this));
@@ -94,9 +109,9 @@ export class Control {
         );
 
         Control.ELEMENT_IDS.forEach((id) => {
-            this.getElement(id).addEventListener('input', (ev: Event) => {
+            this.getElement(id).addEventListener('input', () => {
                 this.update();
-                this.onInputChanged(ev);
+                this.onInputChanged();
             });
         });
 
@@ -106,6 +121,35 @@ export class Control {
                 'click',
                 this.onProjectionModeButtonClicked(mode).bind(this)
             );
+        });
+
+        Control.CHECKBOX_IDS.forEach((id) => {
+            this.getElement(id).addEventListener('input', (ev: Event) => {
+                const element: keyof VecBool3 = id.replace('auto-rotation-', '') as keyof VecBool3;
+                const status: boolean = (ev.target as HTMLInputElement).checked;
+                this.autoRotation[element] = status;
+                // if (status) {
+                //     Control.CHECKBOX_IDS.forEach((xid) => {
+                //         if (id !== xid) {
+                //             const elementX: keyof VecBool3 = xid.replace(
+                //                 'auto-rotation-',
+                //                 ''
+                //             ) as keyof VecBool3;
+                //             this.getElement(xid).checked = false;
+                //             this.autoRotation[elementX] = false;
+                //         }
+                //     });
+                // } else {
+                //     Control.CHECKBOX_IDS.forEach((xid) => {
+                //         const elementX: keyof VecBool3 = xid.replace(
+                //             'auto-rotation-',
+                //             ''
+                //         ) as keyof VecBool3;
+                //         this.getElement(xid).checked = false;
+                //         this.autoRotation[elementX] = false;
+                //     });
+                // }
+            });
         });
     }
 
@@ -159,7 +203,7 @@ export class Control {
 
             const [loaded, fixedFileName] = ModelManager.loadFromFile(fileName, result);
             if (loaded) {
-                this.onInputChanged(e);
+                this.onInputChanged();
                 this.modelControl.add(fixedFileName);
             }
         };
@@ -170,14 +214,14 @@ export class Control {
     private onProjectionModeButtonClicked(mode: ProjectionMode): (e: MouseEvent) => void {
         return (e: MouseEvent): void => {
             this.projectionMode = mode;
-            this.onInputChanged(e);
+            this.onInputChanged();
             e.preventDefault();
         };
     }
 
     private onToggleShadersButtonClicked(e: MouseEvent): void {
         this.useShader = !this.useShader;
-        this.onInputChanged(e);
+        this.onInputChanged();
         e.preventDefault();
     }
 
@@ -205,9 +249,14 @@ export class Control {
         this.setNumber('y-light', Control.ROTATION_DEFAULT_VALUE);
         this.setNumber('z-light', Control.ROTATION_DEFAULT_VALUE);
         this.useShader = true;
+        this.autoRotation = {
+            x: true,
+            y: true,
+            z: true,
+        };
 
         this.update();
-        this.onInputChanged(e);
+        this.onInputChanged();
         e.preventDefault();
     }
 
