@@ -1,5 +1,5 @@
 import { Control } from '../control';
-import { ProjectionMode } from '../types';
+import { ProjectionMode, Vec3 } from '../types';
 import Matrix, { Matrix4 } from '../utils/matrix';
 import ProjectionMatrix from '../utils/projection-matrix';
 import TransformationMatrix from '../utils/transformation-matrix';
@@ -13,9 +13,17 @@ export class Drawer {
     constructor(private readonly control: Control) {}
 
     public calculateTransformation(): void {
-        var rotation = TransformationMatrix.getRotationMatrix(this.control.rotation);
-        var translation = TransformationMatrix.getTranslationMatrix(this.control.translation);
-        var scale = TransformationMatrix.getScaleMatrix(this.control.scale);
+        const { x: x1, y: y1, z: z1 } = this.control.rotation;
+        const { x: x2, y: y2, z: z2 } = this.control.animation.rotation;
+        const inputPlusAnimation: Vec3 = {
+            x: x1 + x2,
+            y: y1 + y2,
+            z: z1 + z2,
+        };
+
+        const rotation = TransformationMatrix.getRotationMatrix(inputPlusAnimation);
+        const translation = TransformationMatrix.getTranslationMatrix(this.control.translation);
+        const scale = TransformationMatrix.getScaleMatrix(this.control.scale);
         this.matrix = Matrix.multiply(rotation, translation);
         this.matrix = Matrix.multiply(this.matrix, scale);
     }

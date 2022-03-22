@@ -21,3 +21,9 @@ control.onInputChanged = () => {
     webGL.draw();
 };
 webGL.start();
+
+// const animation = () => {
+//     console.log('x');
+//     window.requestAnimationFrame(animation);
+// };
+// window.requestAnimationFrame(animation);
