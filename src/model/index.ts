@@ -27,12 +27,19 @@ class ModelManager {
     private static readonly cubeModel: Model = ModelManager.transform(CubeModel);
     private static readonly blockModel: Model = ModelManager.transform(BlockModel);
     private static readonly triangleModel: Model = ModelManager.transform(TriangleModel);
-    private static model: { [key: string]: Model } = {
+    private static readonly DEFAULT_MODEL: { [key: string]: Model } = {
         cube: ModelManager.cubeModel,
         block: ModelManager.blockModel,
         triangle: ModelManager.triangleModel,
     };
+
+    private static model: { [key: string]: Model } = { ...ModelManager.DEFAULT_MODEL };
     private static current: string | null = 'cube';
+
+    public static clear(): void {
+        ModelManager.model = { ...ModelManager.DEFAULT_MODEL };
+        ModelManager.current = 'cube';
+    }
 
     public static getCurrentModel(): Model | null {
         if (!ModelManager.current) {

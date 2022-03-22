@@ -48,6 +48,7 @@ export class Control {
     public cameraDistance: number = Control.CAMERA_DISTANCE_DEFAULT_VALUE;
     public near: number = Control.NEAR_DEFAULT_VALUE;
     public far: number = Control.FAR_DEFAULT_VALUE;
+    public rawModel: boolean = true;
 
     private readonly modelControl: ModelControl = new ModelControl(this);
     public readonly animation: AnimationControl = new AnimationControl(this);
@@ -96,6 +97,13 @@ export class Control {
 
         this.getElement('download-btn').addEventListener('click', () => {
             ModelManager.saveToFile();
+        });
+
+        this.getElement('clear-btn').addEventListener('click', () => {
+            ModelManager.clear();
+            this.modelControl.clear();
+            this.rawModel = true;
+            this.getElement('clear-btn').disabled = this.rawModel;
         });
 
         this.getElement('reset-btn').addEventListener(
@@ -205,6 +213,8 @@ export class Control {
             if (loaded) {
                 this.onInputChanged();
                 this.modelControl.add(fixedFileName);
+                this.rawModel = false;
+                this.getElement('clear-btn').disabled = this.rawModel;
             }
         };
 
@@ -226,7 +236,6 @@ export class Control {
     }
 
     private onResetButtonClicked(e: MouseEvent): void {
-        this.modelControl.clear();
         this.setNumber('x-rotation', Control.ROTATION_DEFAULT_VALUE);
         this.setNumber('y-rotation', Control.ROTATION_DEFAULT_VALUE);
         this.setNumber('z-rotation', Control.ROTATION_DEFAULT_VALUE);
@@ -249,11 +258,6 @@ export class Control {
         this.setNumber('y-light', Control.ROTATION_DEFAULT_VALUE);
         this.setNumber('z-light', Control.ROTATION_DEFAULT_VALUE);
         this.useShader = true;
-        this.autoRotation = {
-            x: true,
-            y: true,
-            z: true,
-        };
 
         this.update();
         this.onInputChanged();
