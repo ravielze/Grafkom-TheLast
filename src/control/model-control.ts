@@ -8,6 +8,10 @@ export default class ModelControl {
     constructor(private readonly parent: Control) {
         this.cloneable = document.getElementById('model-clone') as HTMLElement;
         this.container = document.getElementById('model-container') as HTMLElement;
+        this.refresh();
+    }
+
+    private refresh(): void {
         ModelManager.getModelName().forEach((x) => {
             if (x === 'cube') return;
 
@@ -45,5 +49,6 @@ export default class ModelControl {
 
             this.container.removeChild(iterator);
         }
+        this.refresh();
     }
 }
