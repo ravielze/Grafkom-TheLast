@@ -6,10 +6,10 @@ export default class TransformationMatrix {
     public static getRotationMatrix(angle: Vec3): Matrix4 {
         const cosZ = Math.cos(Utils.degreesToRadians(angle.z));
         const sinZ = Math.sin(Utils.degreesToRadians(angle.z));
-        const cosY = Math.cos(Utils.degreesToRadians(angle.y));
-        const sinY = Math.sin(Utils.degreesToRadians(angle.y));
-        const cosX = Math.cos(Utils.degreesToRadians(angle.x));
-        const sinX = Math.sin(Utils.degreesToRadians(angle.x));
+        const cosX = Math.cos(Utils.degreesToRadians(angle.y));
+        const sinX = Math.sin(Utils.degreesToRadians(angle.y));
+        const cosY = Math.cos(Utils.degreesToRadians(angle.x));
+        const sinY = Math.sin(Utils.degreesToRadians(angle.x));
 
         //prettier-ignore
         return Matrix.multiply(
