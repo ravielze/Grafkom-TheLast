@@ -28,6 +28,8 @@ export class WebGL {
     public lightPos: WebGLUniformLocation | null = null;
     public shadingModeLocation: WebGLUniformLocation | null = null;
     public colorOffset: number = 0;
+    public normalOffset: number = 0;
+    public normal: Float32Array = new Float32Array([]);
 
     constructor(
         gl: WebGLRenderingContext | null,
@@ -39,6 +41,13 @@ export class WebGL {
 
         glx.enable(glx.DEPTH_TEST);
         glx.clearColor(0.0, 0.0, 0.0, 0.0);
+
+        const normal = ModelManager.getModel('block');
+        if (!normal) {
+            alert('Something went wrong!');
+            return;
+        }
+        this.normal = new Float32Array(normal.positions);
     }
 
     public start(): void {
@@ -97,11 +106,14 @@ export class WebGL {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
         gl.bufferData(
             gl.ARRAY_BUFFER,
-            model.positions.byteLength + model.colors.byteLength,
+            model.positions.byteLength + model.colors.byteLength + this.normal.byteLength,
             gl.STATIC_DRAW
         );
-        this.colorOffset = model.positions.byteLength;
+        this.normalOffset = model.positions.byteLength;
+        this.colorOffset = this.normalOffset + this.normal.byteLength;
+
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, model.positions);
+        gl.bufferSubData(gl.ARRAY_BUFFER, this.normalOffset, this.normal);
         gl.bufferSubData(gl.ARRAY_BUFFER, this.colorOffset, model.colors);
 
         this.elementVbo = gl.createBuffer();
@@ -113,6 +125,13 @@ export class WebGL {
 
     public draw(): void {
         const gl = this.gl as WebGLRenderingContext;
+        const model = ModelManager.getCurrentModel();
+        if (!model) {
+            return;
+        }
+
+        // NOTE Rusak D: males benerin
+        // this.normal = this.drawer.calculateNormal(model);
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.enable(gl.DEPTH_TEST);
@@ -123,6 +142,10 @@ export class WebGL {
         // Retrieve Positionns
         gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(0);
+
+        // Retrieve Normals
+        gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, this.normalOffset);
+        gl.enableVertexAttribArray(1);
 
         // Retrieve Colors
         gl.vertexAttribPointer(2, 4, gl.FLOAT, false, 0, this.colorOffset);
@@ -148,17 +171,14 @@ export class WebGL {
         gl.uniform1f(this.kd, 1);
         gl.uniform1f(this.ks, 1);
 
-        this.gl = gl;
-        const model = ModelManager.getCurrentModel();
-        if (!model) {
-            return;
-        }
-
         gl.uniform1f(this.shineValue, model.material.shininess);
         gl.uniform3fv(this.ambientColor, new Float32Array(model.material.ambient));
         gl.uniform3fv(this.diffuseColor, new Float32Array(model.material.diffuse));
         gl.uniform3fv(this.specularColor, new Float32Array(model.material.specular));
-        gl.uniform3fv(this.lightPos, new Float32Array([0, 3, 0]));
+        gl.uniform3fv(
+            this.lightPos,
+            new Float32Array([this.control.light.x, this.control.light.y, this.control.light.z])
+        );
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.elementVbo);
         gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT, 0);

@@ -9,6 +9,12 @@ export class Control {
     private static readonly NEAR_DEFAULT_VALUE: number = 1;
     private static readonly FAR_DEFAULT_VALUE: number = 50;
 
+    public light: Vec3 = {
+        x: Control.ROTATION_DEFAULT_VALUE,
+        y: Control.ROTATION_DEFAULT_VALUE,
+        z: Control.ROTATION_DEFAULT_VALUE,
+    }
+
     public rotation: Vec3 = {
         x: Control.ROTATION_DEFAULT_VALUE,
         y: Control.ROTATION_DEFAULT_VALUE,
@@ -50,6 +56,9 @@ export class Control {
         'camdist',
         'near',
         'far',
+        'x-light',
+        'y-light',
+        'z-light',
     ];
 
     private static readonly PROJECTION_BUTTON_MAPS: { [key: string]: ProjectionMode } = {
@@ -95,6 +104,9 @@ export class Control {
         this.rotation.x = this.getNumber('x-rotation');
         this.rotation.y = this.getNumber('y-rotation');
         this.rotation.z = this.getNumber('z-rotation');
+        this.light.x = this.getNumber('x-light');
+        this.light.y = this.getNumber('y-light');
+        this.light.z = this.getNumber('z-light');
         this.scale.x = this.getNumber('x-scale');
         this.scale.y = this.getNumber('y-scale');
         this.scale.z = this.getNumber('z-scale');
@@ -178,6 +190,9 @@ export class Control {
 
         this.setNumber('near', Control.NEAR_DEFAULT_VALUE);
         this.setNumber('far', Control.FAR_DEFAULT_VALUE);
+        this.setNumber('x-light', Control.ROTATION_DEFAULT_VALUE);
+        this.setNumber('y-light', Control.ROTATION_DEFAULT_VALUE);
+        this.setNumber('z-light', Control.ROTATION_DEFAULT_VALUE);
         this.useShader = true;
 
         this.update();
