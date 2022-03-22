@@ -31,7 +31,7 @@ export default class ModelControl {
             this.container.removeChild(button.parentElement as HTMLElement);
             alert('Model not found.');
         }
-        this.parent.onInputChanged(e);
+        this.parent.onInputChanged();
     }
 
     public clear() {
