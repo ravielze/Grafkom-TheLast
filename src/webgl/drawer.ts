@@ -2,7 +2,7 @@ import { Control } from '../control';
 import { ProjectionMode } from '../types';
 import Matrix, { Matrix4 } from '../utils/matrix';
 import ProjectionMatrix from '../utils/projection-matrix';
-import TransformationMatrix from '../utils/transformation-mattrix';
+import TransformationMatrix from '../utils/transformation-matrix';
 import Vector, { Vector3 } from '../utils/vector';
 
 export class Drawer {
