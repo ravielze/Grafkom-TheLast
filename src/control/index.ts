@@ -1,5 +1,6 @@
 import { ModelManager } from '../model';
 import { ProjectionMode, Vec2, Vec3 } from '../types';
+import ModelControl from './model-control';
 
 export class Control {
     private static readonly ROTATION_DEFAULT_VALUE: number = 0;
@@ -13,7 +14,7 @@ export class Control {
         x: Control.ROTATION_DEFAULT_VALUE,
         y: Control.ROTATION_DEFAULT_VALUE,
         z: Control.ROTATION_DEFAULT_VALUE,
-    }
+    };
 
     public rotation: Vec3 = {
         x: Control.ROTATION_DEFAULT_VALUE,
@@ -40,6 +41,7 @@ export class Control {
     public cameraDistance: number = Control.CAMERA_DISTANCE_DEFAULT_VALUE;
     public near: number = Control.NEAR_DEFAULT_VALUE;
     public far: number = Control.FAR_DEFAULT_VALUE;
+    private readonly modelControl: ModelControl = new ModelControl(this);
 
     private static readonly ELEMENT_IDS: string[] = [
         'x-rotation',
@@ -70,7 +72,10 @@ export class Control {
 
     constructor() {
         this.update();
-        //TODO button model
+        this.getElement('model-btn').addEventListener('click', (e: MouseEvent) => {
+            ModelManager.load('cube');
+            this.onInputChanged(e);
+        });
 
         this.getElement('model-file').addEventListener('change', this.onModelFileLoaded.bind(this));
 
@@ -135,7 +140,7 @@ export class Control {
         }
 
         const reader = new FileReader();
-        const fileName = data.name.replace('.json', '');
+        const fileName = data.name.replace('.json', '').toLowerCase();
         reader.onload = (e) => {
             var result: any = {};
             try {
@@ -148,9 +153,10 @@ export class Control {
                 return;
             }
 
-            const loaded = ModelManager.loadFromFile(fileName, result);
+            const [loaded, fixedFileName] = ModelManager.loadFromFile(fileName, result);
             if (loaded) {
                 this.onInputChanged(e);
+                this.modelControl.add(fixedFileName);
             }
         };
 
@@ -172,6 +178,7 @@ export class Control {
     }
 
     private onResetButtonClicked(e: MouseEvent): void {
+        this.modelControl.clear();
         this.setNumber('x-rotation', Control.ROTATION_DEFAULT_VALUE);
         this.setNumber('y-rotation', Control.ROTATION_DEFAULT_VALUE);
         this.setNumber('z-rotation', Control.ROTATION_DEFAULT_VALUE);

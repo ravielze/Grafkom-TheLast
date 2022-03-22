@@ -25,7 +25,10 @@ interface IRawModel {
 class ModelManager {
     private static readonly cubeModel: Model = ModelManager.transform(CubeModel);
     private static readonly blockModel: Model = ModelManager.transform(BlockModel);
-    private static model: { [key: string]: Model } = { cube: ModelManager.cubeModel, block: ModelManager.blockModel };
+    private static model: { [key: string]: Model } = {
+        cube: ModelManager.cubeModel,
+        block: ModelManager.blockModel,
+    };
     private static currentModel: Model | null = ModelManager.cubeModel;
 
     public static getCurrentModel(): Model | null {
@@ -42,10 +45,15 @@ class ModelManager {
         return { ...ModelManager.model[id] };
     }
 
+    public static getModelName(): string[] {
+        return Object.entries(ModelManager.model).map(([modelName]) => modelName);
+    }
+
     public static load(id: string): Model | null {
         if (!(id in ModelManager.model)) {
             return null;
         }
+        console.log(ModelManager.model);
         ModelManager.currentModel = ModelManager.model[id];
         return { ...ModelManager.currentModel };
     }
@@ -86,17 +94,24 @@ class ModelManager {
         };
     }
 
-    public static loadFromFile(fileName: string, fileData: any): boolean {
+    public static loadFromFile(fileName: string, fileData: any): [boolean, string] {
         const model = this.assertModel(fileData);
         if (!model) {
-            return false;
+            return [false, ''];
+        }
+
+        var i = 1;
+        var fixFileName = fileName;
+        while (fixFileName in ModelManager.model) {
+            fixFileName = `${fileName}-${i}`;
+            i++;
         }
 
         const convertedModel: Model = ModelManager.transform(model);
 
-        ModelManager.model[fileName] = convertedModel;
-        ModelManager.load(fileName);
-        return true;
+        ModelManager.model[fixFileName] = convertedModel;
+        ModelManager.load(fixFileName);
+        return [true, fixFileName];
     }
 
     public static saveToFile(): void {

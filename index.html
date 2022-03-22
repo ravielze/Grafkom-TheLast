@@ -101,20 +101,11 @@
                 <input id="y-camrot" type="range" min="-180" max="180" step="1" value="0" />
             </div>
         </div>
-        <div class="pl-3">
-            <div class="flex items-center space-x-2 p-1 justify-center">
-                <button class="rounded py-1 px-2 text-white bg-cyan-600 hover:bg-cyan-500" id="model1">
-                    Model 1
-                </button>
-            </div>
-            <div class="flex items-center space-x-2 p-1 justify-center">
-                <button class="rounded py-1 px-2 text-white bg-cyan-600 hover:bg-cyan-500" id="model2">
-                    Model 2
-                </button>
-            </div>
-            <div class="flex items-center space-x-2 p-1 justify-center">
-                <button class="rounded py-1 px-2 text-white bg-cyan-600 hover:bg-cyan-500" id="model3">
-                    Model 3
+        <div class="pl-3" id="model-container">
+            <div class="flex items-center space-x-2 p-1 justify-center" id="model-clone">
+                <button class="rounded py-1 px-2 text-white bg-cyan-600 hover:bg-cyan-500 model-btn"
+                    style="text-transform: capitalize" id="model-btn">
+                    Cube
                 </button>
             </div>
         </div>
