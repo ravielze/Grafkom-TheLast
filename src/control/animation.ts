@@ -13,6 +13,14 @@ export class AnimationControl {
         window.requestAnimationFrame(this.tick.bind(this));
     }
 
+    public reset(): void {
+        this.rotation = {
+            x: Control.ROTATION_DEFAULT_VALUE,
+            y: Control.ROTATION_DEFAULT_VALUE,
+            z: Control.ROTATION_DEFAULT_VALUE,
+        };
+    }
+
     public tick(now: DOMHighResTimeStamp): void {
         now *= 0.025;
         const delta = now - this.then;
