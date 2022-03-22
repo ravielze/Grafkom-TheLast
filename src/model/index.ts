@@ -29,13 +29,14 @@ class ModelManager {
         cube: ModelManager.cubeModel,
         block: ModelManager.blockModel,
     };
-    private static currentModel: Model | null = ModelManager.cubeModel;
+    private static current: string | null = 'cube';
 
     public static getCurrentModel(): Model | null {
-        if (!ModelManager.currentModel) {
+        if (!ModelManager.current) {
             return null;
         }
-        return { ...ModelManager.currentModel };
+        const currentModel = ModelManager.model[ModelManager.current];
+        return { ...currentModel };
     }
 
     public static getModel(id: string): Model | null {
@@ -53,9 +54,9 @@ class ModelManager {
         if (!(id in ModelManager.model)) {
             return null;
         }
-        console.log(ModelManager.model);
-        ModelManager.currentModel = ModelManager.model[id];
-        return { ...ModelManager.currentModel };
+        const currentModel = ModelManager.model[id];
+        ModelManager.current = id;
+        return { ...currentModel };
     }
 
     public static assertModel(obj: any): IRawModel | null {
@@ -94,6 +95,15 @@ class ModelManager {
         };
     }
 
+    private static convertBack(model: Model): IRawModel {
+        return {
+            positions: Array.prototype.slice.call(model.positions),
+            indices: Array.prototype.slice.call(model.indices),
+            colors: Array.prototype.slice.call(model.colors),
+            material: model.material,
+        };
+    }
+
     public static loadFromFile(fileName: string, fileData: any): [boolean, string] {
         const model = this.assertModel(fileData);
         if (!model) {
@@ -115,6 +125,19 @@ class ModelManager {
     }
 
     public static saveToFile(): void {
+        if (!ModelManager.current) {
+            alert('No valid model to download.');
+            return;
+        }
+        const element = document.createElement('a');
+        const currentModel = ModelManager.model[ModelManager.current];
+        const content = JSON.stringify(ModelManager.convertBack(currentModel));
+        element.setAttribute('href', 'data:text/json, ' + encodeURIComponent(content));
+        element.setAttribute('download', [ModelManager.current, '.json'].join(''));
+
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
         return;
     }
 }

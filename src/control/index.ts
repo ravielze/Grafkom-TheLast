@@ -79,6 +79,10 @@ export class Control {
 
         this.getElement('model-file').addEventListener('change', this.onModelFileLoaded.bind(this));
 
+        this.getElement('download-btn').addEventListener('click', () => {
+            ModelManager.saveToFile();
+        });
+
         this.getElement('reset-btn').addEventListener(
             'click',
             this.onResetButtonClicked.bind(this)
