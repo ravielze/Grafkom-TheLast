@@ -1,4 +1,5 @@
 import CubeModel from './cube.json';
+import BlockModel from './block.json';
 
 interface Model {
     positions: Float32Array;
@@ -22,8 +23,9 @@ interface IRawModel {
 }
 
 class ModelManager {
-    private static cubeModel: Model = ModelManager.transform(CubeModel);
-    private static model: { [key: string]: Model } = { cube: ModelManager.cubeModel };
+    private static readonly cubeModel: Model = ModelManager.transform(CubeModel);
+    private static readonly blockModel: Model = ModelManager.transform(BlockModel);
+    private static model: { [key: string]: Model } = { cube: ModelManager.cubeModel, block: ModelManager.blockModel };
     private static currentModel: Model | null = ModelManager.cubeModel;
 
     public static getCurrentModel(): Model | null {
@@ -31,6 +33,13 @@ class ModelManager {
             return null;
         }
         return { ...ModelManager.currentModel };
+    }
+
+    public static getModel(id: string): Model | null {
+        if (!(id in ModelManager.model)) {
+            return null;
+        }
+        return { ...ModelManager.model[id] };
     }
 
     public static load(id: string): Model | null {

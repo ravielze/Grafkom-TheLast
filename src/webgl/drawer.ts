@@ -20,6 +20,47 @@ export class Drawer {
         this.matrix = Matrix.multiply(this.matrix, scale);
     }
 
+    // NOTE Rusak!!! males benerin
+    // public calculateNormal(model: Model): Float32Array {
+    //     const result = Array(model.positions.length).fill(0);
+
+    //     const modelPos = model.positions;
+    //     const modelInd = model.indices;
+
+    //     for (var i = 0; i < modelInd.length / 3; i = i + 3) {
+    //         const v1: Vector3 = [];
+    //         const v2: Vector3 = [];
+    //         const v3: Vector3 = [];
+    //         for (var j = 0; j < 3; j++) {
+    //             v1.push(modelPos[modelInd[i] * 3 + j]);
+    //             v2.push(modelPos[modelInd[i + 1] * 3 + j]);
+    //             v3.push(modelPos[modelInd[i + 2] * 3 + j]);
+    //         }
+
+    //         const [a, b]: number[][] = [[], []];
+    //         for (var k = 0; k < 3; k++) {
+    //             a.push(v2[k] - v1[k]);
+    //             b.push(v3[k] - v1[k]);
+    //         }
+
+    //         //prettier-ignore
+    //         const normal = [
+    //             a[1] * b[2] - a[2] * b[1],
+    //             a[2] * b[0] - a[0] * b[2],
+    //             a[0] * b[1] - a[1] * b[0]
+    //         ]
+
+    //         for (var l = 0; l < 3; l++) {
+    //             result[modelInd[i] * 3 + l] += normal[l];
+    //             result[modelInd[i + 1] * 3 + l] += normal[l];
+    //             result[modelInd[i + 2] * 3 + l] += normal[l];
+    //         }
+    //     }
+
+    //     console.log(result);
+    //     return new Float32Array(result);
+    // }
+
     public calculateCameraProjection(): void {
         var cameraPosition: Vector3 = [0, 0, this.control.cameraDistance];
         var targetPosition = [0, 0, 0];
