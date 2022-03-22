@@ -259,6 +259,8 @@ export class Control {
         this.setNumber('z-light', Control.ROTATION_DEFAULT_VALUE);
         this.useShader = true;
 
+        this.animation.reset();
+
         this.update();
         this.onInputChanged();
         e.preventDefault();
