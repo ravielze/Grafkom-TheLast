@@ -1,5 +1,6 @@
 import CubeModel from './cube.json';
 import BlockModel from './block.json';
+import SegitigaModel from './limasSegitiga.json';
 
 interface Model {
     positions: Float32Array;
@@ -25,9 +26,11 @@ interface IRawModel {
 class ModelManager {
     private static readonly cubeModel: Model = ModelManager.transform(CubeModel);
     private static readonly blockModel: Model = ModelManager.transform(BlockModel);
+    private static readonly segitigaModel: Model = ModelManager.transform(SegitigaModel);
     private static model: { [key: string]: Model } = {
         cube: ModelManager.cubeModel,
         block: ModelManager.blockModel,
+        segitiga: ModelManager.segitigaModel,
     };
     private static current: string | null = 'cube';
 
