@@ -66,7 +66,7 @@ export class Drawer {
         var targetPosition = [0, 0, 0];
 
         const xRotMat = TransformationMatrix.getRotationMatrix({
-            x: this.control.cameraRotation.x,
+            x: this.control.cameraRotation.y,
             y: 0,
             z: 0,
         });
@@ -75,7 +75,7 @@ export class Drawer {
 
         const yRotMat = TransformationMatrix.getRotationMatrix({
             x: 0,
-            y: this.control.cameraRotation.y,
+            y: this.control.cameraRotation.x,
             z: 0,
         });
         const forwardVectorY = [...cameraPosition, 1];
