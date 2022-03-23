@@ -1,6 +1,7 @@
 import CubeModel from './cube.json';
 import BlockModel from './block.json';
 import TriangleModel from './triangle.json';
+import PrismModel from './prism.json';
 
 interface Model {
     positions: Float32Array;
@@ -27,10 +28,12 @@ class ModelManager {
     private static readonly cubeModel: Model = ModelManager.transform(CubeModel);
     private static readonly blockModel: Model = ModelManager.transform(BlockModel);
     private static readonly triangleModel: Model = ModelManager.transform(TriangleModel);
+    private static readonly prismModel: Model = ModelManager.transform(PrismModel);
     private static readonly DEFAULT_MODEL: { [key: string]: Model } = {
         cube: ModelManager.cubeModel,
         block: ModelManager.blockModel,
         triangle: ModelManager.triangleModel,
+        prism: ModelManager.prismModel,
     };
 
     private static model: { [key: string]: Model } = { ...ModelManager.DEFAULT_MODEL };
