@@ -1,4 +1,4 @@
-# IF2360-Proyek2
+# Grafkom The Last - Articulated Model
 
 ## Petunjuk
 
@@ -16,5 +16,5 @@ Untuk menjalankan `npm run dev`
 ## Kelompok
 
 -   Steven Nataniel / 13519002
--   Louis Riemenn / 13519016
--   Dzaki Muhammad / 13519043
+-   Rahmah Khoirussyifa' Nurdini / 13519013
+-   Ridho Daffasyah / 13519038
