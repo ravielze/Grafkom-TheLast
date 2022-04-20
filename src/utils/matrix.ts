@@ -1,3 +1,4 @@
+import { Vec3 } from '../types';
 import Vector, { Vector3 } from './vector';
 
 export type Matrix4 = number[];
@@ -123,5 +124,74 @@ export default class Matrix {
             }
         }
         return result;
+    }
+
+    public static matLookAt(eye: number[], center: number[], up: number[]): Matrix4 {
+        const EPSILON = 0.001;
+        const A: Vec3 = { x: 0, y: 0, z: 0 };
+        const B: Vec3 = { x: 0, y: 0, z: 0 };
+        const C: Vec3 = { x: 0, y: 0, z: 0 };
+        const Eye: Vec3 = { x: eye[0], y: eye[1], z: eye[2] };
+        const Up: Vec3 = { x: up[0], y: up[1], z: up[2] };
+        const Center: Vec3 = { x: center[0], y: center[1], z: center[2] };
+        var N: number = 0;
+
+        if (
+            Math.abs(Eye.x - Center.x) < EPSILON &&
+            Math.abs(Eye.y - Center.y) < EPSILON &&
+            Math.abs(Eye.z - Center.z) < EPSILON
+        ) {
+            return Matrix.identity();
+        }
+
+        A.z = Eye.x - Center.x;
+        B.z = Eye.y - Center.y;
+        C.z = Eye.z - Center.z;
+
+        N = 1 / Math.sqrt(A.z * A.z + B.z * B.z + C.z * C.z);
+        A.z *= N;
+        B.z *= N;
+        C.z *= N;
+
+        A.x = Up.y * C.z - Up.z * B.z;
+        B.x = Up.z * A.z - Up.x * C.z;
+        C.x = Up.x * B.z - Up.y * A.z;
+
+        N = Math.sqrt(A.x * A.x + B.x * B.x + C.x * C.x);
+
+        if (!N) {
+            A.x = 0;
+            B.x = 0;
+            C.x = 0;
+        } else {
+            N = 1 / N;
+            A.x *= N;
+            B.x *= N;
+            C.x *= N;
+        }
+
+        A.y = B.z * C.x - C.z * B.x;
+        B.y = C.z * A.x - A.z * C.x;
+        C.y = A.z * B.x - B.z * A.x;
+
+        N = Math.sqrt(A.y * A.y + B.y * B.y + C.y * C.y);
+        if (!N) {
+            A.y = 0;
+            B.y = 0;
+            C.y = 0;
+        } else {
+            N = 1 / N;
+            A.y *= N;
+            B.y *= N;
+            C.y *= N;
+        }
+
+        // prettier-ignore
+        return [
+            A.x, A.y, A.z, 0,
+            B.x, B.y, B.z, 0,
+            C.x, C.y, C.z, 0,
+            -(A.x*Eye.x + B.x*Eye.y + C.x*Eye.z), -(A.y*Eye.x + B.y*Eye.y + C.y*Eye.z), -(A.z*Eye.x + B.z*Eye.y + C.z*Eye.z), 1
+        ];
     }
 }

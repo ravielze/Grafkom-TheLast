@@ -77,6 +77,7 @@ export abstract class Renderer {
         image.src = imgData;
         image.addEventListener('load', function () {
             gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.activeTexture(gl.TEXTURE0);
             gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image);
 
             if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
@@ -158,13 +159,11 @@ export abstract class Renderer {
         gl.vertexAttribPointer(this.webGL.vertPosition, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(this.webGL.vertPosition);
 
-        if (this.mappingMode == 0) {
-            gl.bindBuffer(gl.ARRAY_BUFFER, color);
-            gl.bufferData(gl.ARRAY_BUFFER, node.color, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, color);
+        gl.bufferData(gl.ARRAY_BUFFER, node.color, gl.STATIC_DRAW);
 
-            gl.vertexAttribPointer(this.webGL.vertColor, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(this.webGL.vertColor);
-        }
+        gl.vertexAttribPointer(this.webGL.vertColor, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(this.webGL.vertColor);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, textureCoord);
         gl.bufferData(gl.ARRAY_BUFFER, node.textureCoord, gl.STATIC_DRAW);
@@ -180,9 +179,13 @@ export abstract class Renderer {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, tangent);
         gl.bufferData(gl.ARRAY_BUFFER, node.tangent, gl.STATIC_DRAW);
+        gl.vertexAttribPointer(this.webGL.vertTangent!, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(this.webGL.vertTangent!);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, bitangent);
         gl.bufferData(gl.ARRAY_BUFFER, node.bitangent, gl.STATIC_DRAW);
+        gl.vertexAttribPointer(this.webGL.vertBitangent!, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(this.webGL.vertBitangent!);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indices);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, node.indices, gl.STATIC_DRAW);
