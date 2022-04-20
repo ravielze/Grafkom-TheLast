@@ -12,6 +12,7 @@ import DefaultMatrix from '../../utils/default-matrix';
 import { WebGL } from '../../webgl';
 import { NodePoint } from '../node-point';
 import texture from '../../texture/cow.jpg';
+import { Control } from '../../control';
 
 export class CowSkeleton extends Renderer {
     constructor(webGL: WebGL, public cow: Cow) {
@@ -56,11 +57,11 @@ export class Cow extends Model {
         const tailSize = [0.05 / scale, 0.2 / scale, 1.75 / scale];
         const legSize = [0.2 / scale, 0.8 / scale, 0.2 / scale];
 
-        const kScaleBody = [bodySize[0] / cubeSize, bodySize[1] / cubeSize, bodySize[2] / cubeSize]
-        const kScaleNeck = [neckSize[0] / cubeSize, neckSize[1] / cubeSize, neckSize[2] / cubeSize]
-        const kScaleHead = [headSize[0] / cubeSize, headSize[1] / cubeSize, headSize[2] / cubeSize]
-        const kScaleEar = [earSize[0] / cubeSize, earSize[1] / cubeSize, earSize[2] / cubeSize]
-        const kScaleTail = [tailSize[0] / cubeSize, tailSize[1] / cubeSize, tailSize[2] / cubeSize]
+        const kScaleBody = [bodySize[0] / cubeSize, bodySize[1] / cubeSize, bodySize[2] / cubeSize];
+        const kScaleNeck = [neckSize[0] / cubeSize, neckSize[1] / cubeSize, neckSize[2] / cubeSize];
+        const kScaleHead = [headSize[0] / cubeSize, headSize[1] / cubeSize, headSize[2] / cubeSize];
+        const kScaleEar = [earSize[0] / cubeSize, earSize[1] / cubeSize, earSize[2] / cubeSize];
+        const kScaleTail = [tailSize[0] / cubeSize, tailSize[1] / cubeSize, tailSize[2] / cubeSize];
         const kScaleLeg = [legSize[0] / cubeSize, legSize[1] / cubeSize, legSize[2] / cubeSize];
 
         const translateBody = [xCenter, 0, 0];
@@ -446,7 +447,7 @@ export class Cow extends Model {
     }
 
     public distributeRotation(val: number): void {
-        this.inRotation['neck']['x'] = val / 2;
+        this.inRotation['neck']['x'] = val / 10;
         this.inRotation['leg-front-left']['x'] = val;
         this.inRotation['leg-front-right']['x'] = -val;
         this.inRotation['leg-back-left']['x'] = val;

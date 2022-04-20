@@ -102,7 +102,7 @@ export class WebGL {
         const cat = new Cat(this.control);
         this.catSkeleton = new CatSkeleton(this, cat);
 
-        const human = new Human(this);
+        const human = new Human(this, this.control);
         this.humanSkeleton = new HumanSkeleton(this, human);
 
         this.gl = gl;

@@ -446,7 +446,7 @@ export class Cat extends Model {
     }
 
     public distributeRotation(val: number): void {
-        this.inRotation['neck']['x'] = val / 2;
+        this.inRotation['neck']['x'] = val / 5;
         this.inRotation['leg-front-left']['x'] = val;
         this.inRotation['leg-front-right']['x'] = -val;
         this.inRotation['leg-back-left']['x'] = val;
