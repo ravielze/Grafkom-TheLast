@@ -11,7 +11,7 @@ import { CubeOperation } from '../../cube/operation';
 import DefaultMatrix from '../../utils/default-matrix';
 import { WebGL } from '../../webgl';
 import { NodePoint } from '../node-point';
-import { texture } from './texture';
+import texture from '../../texture/stone.jpg';
 
 export class DogSkeleton extends Renderer {
     constructor(webGL: WebGL, public dog: Dog) {

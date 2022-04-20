@@ -13,7 +13,10 @@ if (gl == null || ext == null) {
     alert('WebGL is not supported in your machine/browser.');
 }
 const control: Control = new Control();
-new WebGL(gl as WebGLRenderingContext, control, canvas);
+const wgl = new WebGL(gl as WebGLRenderingContext, control, canvas);
+control.onInputChanged = () => {
+    wgl.render();
+};
 // const control: Control = new Control();
 // const drawer: Drawer = new Drawer(control);
 // const webGL: WebGL = new WebGL(gl, drawer, control);
