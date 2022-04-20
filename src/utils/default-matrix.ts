@@ -13,16 +13,18 @@ export default class DefaultMatrix {
         const m1R = m1.length;
         const m1C = m1[0].length;
         const m2C = m2[0].length;
+
         const result = new Array(m1R);
-        for (var i = 0; i < m1R; i++) {
-            result[i] = new Array(m1C);
-            for (var j = 0; j < m2C; j++) {
+        for (var i = 0; i < m1R; ++i) {
+            result[i] = new Array(m2C);
+            for (var j = 0; j < m2C; ++j) {
                 result[i][j] = 0;
-                for (var k = 0; k < m1C; k++) {
+                for (var k = 0; k < m1C; ++k) {
                     result[i][j] += m1[i][k] * m2[k][j];
                 }
             }
         }
+
         return result;
     }
 

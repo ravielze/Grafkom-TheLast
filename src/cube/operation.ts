@@ -94,7 +94,7 @@ export class CubeOperation {
         const tM = DefaultMatrix.import(TransformationMatrix.getTranslationMatrix(delta));
         for (var i = 0; i < matrices.length; ++i) {
             const translated = DefaultMatrix.export(DefaultMatrix.multiply(tM, matrices[i]));
-            result.push(...translated);
+            result.push(...[translated[0], translated[1], translated[2]]);
         }
         return new Float32Array(result);
     }
@@ -104,8 +104,8 @@ export class CubeOperation {
         const result: number[] = [];
         const kM = DefaultMatrix.import(TransformationMatrix.getScaleMatrix(factor));
         for (var i = 0; i < matrices.length; ++i) {
-            const translated = DefaultMatrix.export(DefaultMatrix.multiply(kM, matrices[i]));
-            result.push(...translated);
+            const scaled = DefaultMatrix.export(DefaultMatrix.multiply(kM, matrices[i]));
+            result.push(...[scaled[0], scaled[1], scaled[2]]);
         }
         return new Float32Array(result);
     }
@@ -120,7 +120,9 @@ export class CubeOperation {
                 [1],
             ]);
             const transformedExported = DefaultMatrix.export(transformed);
-            result.push(...transformedExported);
+            result.push(
+                ...[transformedExported[0], transformedExported[1], transformedExported[2]]
+            );
         }
 
         return new Float32Array(result);

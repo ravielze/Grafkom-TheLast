@@ -75,23 +75,23 @@ export class WebGL {
         this.mProj = gl.getUniformLocation(glp, 'mProj') as WebGLUniformLocation;
         this.mNorm = gl.getUniformLocation(glp, 'mNorm') as WebGLUniformLocation;
         this.mBump = gl.getUniformLocation(glp, 'mBump') as WebGLUniformLocation;
-        this.mode = gl.getUniformLocation(glp, 'mode') as WebGLUniformLocation;
+        // this.mode = gl.getUniformLocation(glp, 'mode') as WebGLUniformLocation;
         this.stateShade = gl.getUniformLocation(glp, 'stateShade') as WebGLUniformLocation;
-        this.stateTexture = gl.getUniformLocation(glp, 'stateTexture') as WebGLUniformLocation;
-        this.uSampler = gl.getUniformLocation(glp, 'uSampler') as WebGLUniformLocation;
-        this.uSamplerCube = gl.getUniformLocation(glp, 'uSamplerCube') as WebGLUniformLocation;
+        // this.stateTexture = gl.getUniformLocation(glp, 'textureOn') as WebGLUniformLocation;
+        // this.uSampler = gl.getUniformLocation(glp, 'uSampler') as WebGLUniformLocation;
+        // this.uSamplerCube = gl.getUniformLocation(glp, 'uSamplerCube') as WebGLUniformLocation;
 
         this.initMatrix();
 
         gl.uniform1i(this.stateShade!, this.control.useShader ? 1 : 0);
-        gl.uniform1i(this.stateTexture!, 0);
+        //gl.uniform1i(this.stateTexture!, 0);
 
         gl.uniformMatrix4fv(this.mWorld!, false, new Float32Array(this.worldMatrix));
         gl.uniformMatrix4fv(this.mView!, false, new Float32Array(this.cameraMatrix));
         gl.uniformMatrix4fv(this.mProj!, false, new Float32Array(this.projMatrix));
         gl.uniformMatrix4fv(this.mNorm!, false, new Float32Array(this.normMatrix));
-        gl.uniform1i(this.uSampler!, 1);
-        gl.uniform1i(this.uSamplerCube!, 0);
+        //gl.uniform1i(this.uSampler!, 1);
+        //gl.uniform1i(this.uSamplerCube!, 0);
         gl.uniformMatrix3fv(this.mBump!, false, new Float32Array(this.normBumpMatrix));
 
         const dog = new Dog();
@@ -160,19 +160,8 @@ export class WebGL {
         this.glProgram = gl.createProgram() as WebGLProgram;
         var glp = this.glProgram;
 
-        const createShader = (source: string, type: number): WebGLShader | null => {
-            const shader = gl.createShader(type) as WebGLShader;
-            gl.shaderSource(shader, source);
-            gl.compileShader(shader);
-
-            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                return null;
-            }
-            return shader;
-        };
-
-        const vertexShader = createShader(BodyVertexShader, gl.VERTEX_SHADER);
-        const fragmentShader = createShader(BodyFragmentShader, gl.FRAGMENT_SHADER);
+        const vertexShader = this.createShader(BodyVertexShader, gl.VERTEX_SHADER);
+        const fragmentShader = this.createShader(BodyFragmentShader, gl.FRAGMENT_SHADER);
         if (vertexShader == null || fragmentShader == null) {
             alert('Shader compilation error!');
             return false;
@@ -191,5 +180,18 @@ export class WebGL {
         this.glProgram = glp;
         this.gl = gl;
         return true;
+    }
+
+    private createShader(source: string, type: number): WebGLShader | null {
+        var gl = this.gl as WebGLRenderingContext;
+        const shader = gl.createShader(type) as WebGLShader;
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            return null;
+        }
+        this.gl = gl;
+        return shader;
     }
 }
