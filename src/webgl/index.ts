@@ -3,6 +3,7 @@ import BodyFragmentShader from './shaders/body-fragment-shader.glsl';
 import Matrix, { Matrix3, Matrix4 } from '../utils/matrix';
 import { Control } from '../control';
 import ProjectionMatrix from '../utils/projection-matrix';
+import { Cow, CowSkeleton } from '../model/models/cow';
 import { Cat, CatSkeleton } from '../model/models/cat';
 import { Vec3 } from '../types';
 import TransformationMatrix from '../utils/transformation-matrix';
@@ -36,6 +37,7 @@ export class WebGL {
     public normMatrix: Matrix4 = Array(16).fill(0);
     public normBumpMatrix: Matrix3 = Array(9).fill(0);
 
+    private cowSkeleton?: CowSkeleton;
     private catSkeleton?: CatSkeleton;
     private humanSkeleton?: HumanSkeleton;
 
@@ -95,6 +97,8 @@ export class WebGL {
         gl.uniform1i(this.uSamplerCube!, 0);
         gl.uniformMatrix3fv(this.mBump!, false, new Float32Array(this.normBumpMatrix));
 
+        const cow = new Cow(this.control);
+        this.cowSkeleton = new CowSkeleton(this, cow);
         const cat = new Cat(this.control);
         this.catSkeleton = new CatSkeleton(this, cat);
 
@@ -117,6 +121,7 @@ export class WebGL {
         this.calculateWorldMatrix();
         this.calculateProjection();
         this.calculateToggle();
+        this.cowSkeleton!.draw();
         this.catSkeleton!.draw();
         this.humanSkeleton!.draw();
 
