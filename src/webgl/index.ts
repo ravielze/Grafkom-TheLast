@@ -6,6 +6,7 @@ import ProjectionMatrix from '../utils/projection-matrix';
 import { Cat, CatSkeleton } from '../model/models/cat';
 import { Vec3 } from '../types';
 import TransformationMatrix from '../utils/transformation-matrix';
+import { Human, HumanSkeleton } from '../model/models/human';
 
 export class WebGL {
     public gl: WebGLRenderingContext;
@@ -36,6 +37,7 @@ export class WebGL {
     public normBumpMatrix: Matrix3 = Array(9).fill(0);
 
     private catSkeleton?: CatSkeleton;
+    private humanSkeleton?: HumanSkeleton;
 
     constructor(
         gl: WebGLRenderingContext,
@@ -96,6 +98,9 @@ export class WebGL {
         const cat = new Cat(this.control);
         this.catSkeleton = new CatSkeleton(this, cat);
 
+        const human = new Human(this);
+        this.humanSkeleton = new HumanSkeleton(this, human);
+
         this.gl = gl;
         this.glProgram = glp;
         this.render();
@@ -113,6 +118,7 @@ export class WebGL {
         this.calculateProjection();
         this.calculateToggle();
         this.catSkeleton!.draw();
+        this.humanSkeleton!.draw();
 
         this.gl = gl;
     }
