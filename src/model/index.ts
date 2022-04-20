@@ -74,7 +74,8 @@ export abstract class Renderer {
             return (value & (value - 1)) == 0;
         };
 
-        image.onload = function () {
+        image.src = imgData;
+        image.addEventListener('load', function () {
             gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image);
 
@@ -85,8 +86,7 @@ export abstract class Renderer {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             }
-        };
-        image.src = imgData;
+        });
 
         this.webGL.gl = gl;
         return texture as WebGLTexture;
@@ -192,7 +192,6 @@ export abstract class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, node.textureData);
             gl.uniform1i(this.webGL.uSampler!, 1);
         }
-
         gl.drawElements(gl.TRIANGLES, node.indices.length, gl.UNSIGNED_SHORT, 0);
 
         this.webGL.gl = gl;

@@ -108,11 +108,13 @@ export class Dog extends Model {
             y: kScaleBody[1],
             z: kScaleBody[2],
         });
+
         const neck = CubeOperation.scale(CUBE_POSITIONS, {
             x: kScaleNeck[0],
             y: kScaleNeck[1],
             z: kScaleNeck[2],
         });
+
         const head = CubeOperation.scale(CUBE_POSITIONS, {
             x: kScaleHead[0],
             y: kScaleHead[1],
@@ -328,7 +330,7 @@ export class Dog extends Model {
 
         //this.createTree();
         const skeletonNodes: { [key: string]: NodePoint } = {};
-        for (var k in this.skeletons)
+        for (var k in this.skeletons) {
             skeletonNodes[k] = new NodePoint(
                 DefaultMatrix.identity(),
                 this.jointPoints[k],
@@ -343,6 +345,7 @@ export class Dog extends Model {
                 this.textureCoords[k],
                 k
             );
+        }
 
         this.root = skeletonNodes['body'];
         this.root.L = skeletonNodes['neck'];
@@ -358,6 +361,7 @@ export class Dog extends Model {
         this.transformModel();
         this.updateAnimation();
         this.updateTransform();
+        console.log(this.root);
     }
 
     public updateTransform(node: NodePoint = this.root!): void {
