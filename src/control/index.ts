@@ -40,9 +40,9 @@ export class Control {
     };
 
     public autoRotation: VecBool3 = {
-        x: true,
-        y: true,
-        z: true,
+        x: false,
+        y: false,
+        z: false,
     };
     public cameraDistance: number = Control.CAMERA_DISTANCE_DEFAULT_VALUE;
     public near: number = Control.NEAR_DEFAULT_VALUE;

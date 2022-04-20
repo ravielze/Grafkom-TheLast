@@ -4,6 +4,8 @@ import Matrix, { Matrix3, Matrix4 } from '../utils/matrix';
 import { Control } from '../control';
 import ProjectionMatrix from '../utils/projection-matrix';
 import { Dog, DogSkeleton } from '../model/models/dog';
+import { Vec3 } from '../types';
+import TransformationMatrix from '../utils/transformation-matrix';
 
 export class WebGL {
     public gl: WebGLRenderingContext;
@@ -82,8 +84,8 @@ export class WebGL {
         this.initMatrix();
         console.log(this.worldMatrix);
 
-        gl.uniform1i(this.stateTexture!, 0);
-        gl.uniform1i(this.stateShade!, 1);
+        gl.uniform1i(this.stateTexture!, 1);
+        gl.uniform1i(this.stateShade!, this.control.useShader ? 1 : 0);
 
         gl.uniformMatrix4fv(this.mWorld!, false, new Float32Array(this.worldMatrix));
         gl.uniformMatrix4fv(this.mView!, false, new Float32Array(this.cameraMatrix));
@@ -101,7 +103,7 @@ export class WebGL {
         this.render();
     }
 
-    private render(): void {
+    public render(): void {
         const gl = this.gl;
         gl.clearColor(0, 0, 0, 0);
         gl.clearDepth(1.0);
@@ -109,6 +111,8 @@ export class WebGL {
         gl.depthFunc(gl.LEQUAL);
 
         gl.clear(gl.COLOR_BUFFER_BIT || gl.DEPTH_BUFFER_BIT);
+        this.calculateWorldMatrix();
+        this.calculateToggle();
         this.dogSkeleton!.draw();
 
         this.gl = gl;
@@ -133,6 +137,28 @@ export class WebGL {
             cm(3), cm(4), cm(5),
             cm(6), cm(7), cm(8)
         ]
+    }
+
+    public calculateWorldMatrix(): void {
+        const { x: x1, y: y1, z: z1 } = this.control.rotation;
+        const { x: x2, y: y2, z: z2 } = this.control.animation.rotation;
+        const inputPlusAnimation: Vec3 = {
+            x: x1 + x2,
+            y: y1 + y2,
+            z: z1 + z2,
+        };
+
+        const rotation = TransformationMatrix.getRotationMatrix(inputPlusAnimation);
+        const translation = TransformationMatrix.getTranslationMatrix(this.control.translation);
+        const scale = TransformationMatrix.getScaleMatrix(this.control.scale);
+        this.worldMatrix = Matrix.multiply(rotation, translation);
+        this.worldMatrix = Matrix.multiply(this.worldMatrix, scale);
+
+        this.gl.uniformMatrix4fv(this.mWorld!, false, new Float32Array(this.worldMatrix));
+    }
+
+    public calculateToggle(): void {
+        this.gl.uniform1i(this.stateShade!, this.control.useShader ? 1 : 0);
     }
 
     private initShaders(): boolean {
