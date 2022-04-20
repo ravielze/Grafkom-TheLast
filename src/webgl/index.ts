@@ -3,7 +3,6 @@ import BodyFragmentShader from './shaders/body-fragment-shader.glsl';
 import { Drawer } from './drawer';
 import Matrix from '../utils/matrix';
 import { Control } from '../control';
-import { ModelManager } from '../model';
 
 export class WebGL {
     public gl: WebGLRenderingContext | null = null;
@@ -42,12 +41,12 @@ export class WebGL {
         glx.enable(glx.DEPTH_TEST);
         glx.clearColor(0.0, 0.0, 0.0, 0.0);
 
-        const normal = ModelManager.getModel('block');
-        if (!normal) {
-            alert('Something went wrong!');
-            return;
-        }
-        this.normal = new Float32Array(normal.positions);
+        //const normal = ModelManager.getModel('block');
+        // if (!normal) {
+        //     alert('Something went wrong!');
+        //     return;
+        // }
+        //this.normal = new Float32Array(normal.positions);
     }
 
     public start(): void {
@@ -97,41 +96,38 @@ export class WebGL {
 
     public loadModel(): void {
         const gl = this.gl as WebGLRenderingContext;
-        const model = ModelManager.getCurrentModel();
-        if (!model) {
-            return;
-        }
+        // const model = ModelManager.getCurrentModel();
+        // if (!model) {
+        //     return;
+        // }
 
         this.vbo = gl.createBuffer() as WebGLBuffer;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-        gl.bufferData(
-            gl.ARRAY_BUFFER,
-            model.positions.byteLength + model.colors.byteLength + this.normal.byteLength,
-            gl.STATIC_DRAW
-        );
-        this.normalOffset = model.positions.byteLength;
-        this.colorOffset = this.normalOffset + this.normal.byteLength;
+        // gl.bufferData(
+        //     gl.ARRAY_BUFFER,
+        //     model.positions.byteLength + model.colors.byteLength + this.normal.byteLength,
+        //     gl.STATIC_DRAW
+        // );
+        // this.normalOffset = model.positions.byteLength;
+        // this.colorOffset = this.normalOffset + this.normal.byteLength;
 
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, model.positions);
-        gl.bufferSubData(gl.ARRAY_BUFFER, this.normalOffset, this.normal);
-        gl.bufferSubData(gl.ARRAY_BUFFER, this.colorOffset, model.colors);
+        // gl.bufferSubData(gl.ARRAY_BUFFER, 0, model.positions);
+        // gl.bufferSubData(gl.ARRAY_BUFFER, this.normalOffset, this.normal);
+        // gl.bufferSubData(gl.ARRAY_BUFFER, this.colorOffset, model.colors);
 
-        this.elementVbo = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.elementVbo);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, model.indices, gl.STATIC_DRAW);
+        // this.elementVbo = gl.createBuffer();
+        // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.elementVbo);
+        // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, model.indices, gl.STATIC_DRAW);
 
         this.gl = gl;
     }
 
     public draw(): void {
         const gl = this.gl as WebGLRenderingContext;
-        const model = ModelManager.getCurrentModel();
-        if (!model) {
-            return;
-        }
-
-        // NOTE Rusak D: males benerin
-        // this.normal = this.drawer.calculateNormal(model);
+        // const model = ModelManager.getCurrentModel();
+        // if (!model) {
+        //     return;
+        // }
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.enable(gl.DEPTH_TEST);
@@ -171,17 +167,17 @@ export class WebGL {
         gl.uniform1f(this.kd, 1);
         gl.uniform1f(this.ks, 1);
 
-        gl.uniform1f(this.shineValue, model.material.shininess);
-        gl.uniform3fv(this.ambientColor, new Float32Array(model.material.ambient));
-        gl.uniform3fv(this.diffuseColor, new Float32Array(model.material.diffuse));
-        gl.uniform3fv(this.specularColor, new Float32Array(model.material.specular));
+        // gl.uniform1f(this.shineValue, model.material.shininess);
+        // gl.uniform3fv(this.ambientColor, new Float32Array(model.material.ambient));
+        // gl.uniform3fv(this.diffuseColor, new Float32Array(model.material.diffuse));
+        // gl.uniform3fv(this.specularColor, new Float32Array(model.material.specular));
         gl.uniform3fv(
             this.lightPos,
             new Float32Array([this.control.light.x, this.control.light.y, this.control.light.z])
         );
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.elementVbo);
-        gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT, 0);
+        // gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT, 0);
 
         this.gl = gl;
     }

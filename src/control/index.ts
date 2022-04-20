@@ -1,7 +1,5 @@
-import { ModelManager } from '../model';
 import { ProjectionMode, Vec2, Vec3, VecBool3 } from '../types';
 import { AnimationControl } from './animation';
-import ModelControl from './model-control';
 
 export class Control {
     public static readonly ROTATION_DEFAULT_VALUE: number = 0;
@@ -33,6 +31,7 @@ export class Control {
         z: Control.TRANSLATION_DEFAULT_VALUE,
     };
     public useShader: boolean = true;
+    public animate: boolean = true;
     public projectionMode: ProjectionMode = ProjectionMode.Perspective;
 
     public cameraRotation: Vec2 = {
@@ -48,9 +47,7 @@ export class Control {
     public cameraDistance: number = Control.CAMERA_DISTANCE_DEFAULT_VALUE;
     public near: number = Control.NEAR_DEFAULT_VALUE;
     public far: number = Control.FAR_DEFAULT_VALUE;
-    public rawModel: boolean = true;
 
-    private readonly modelControl: ModelControl = new ModelControl(this);
     public readonly animation: AnimationControl = new AnimationControl(this);
 
     private static readonly ELEMENT_IDS: string[] = [
@@ -88,23 +85,6 @@ export class Control {
 
     constructor() {
         this.update();
-        this.getElement('model-btn').addEventListener('click', () => {
-            ModelManager.load('cube');
-            this.onInputChanged();
-        });
-
-        this.getElement('model-file').addEventListener('change', this.onModelFileLoaded.bind(this));
-
-        this.getElement('download-btn').addEventListener('click', () => {
-            ModelManager.saveToFile();
-        });
-
-        this.getElement('clear-btn').addEventListener('click', () => {
-            ModelManager.clear();
-            this.modelControl.clear();
-            this.rawModel = true;
-            this.getElement('clear-btn').disabled = this.rawModel;
-        });
 
         this.getElement('reset-btn').addEventListener(
             'click',
@@ -114,6 +94,11 @@ export class Control {
         this.getElement('toggle-shading-btn').addEventListener(
             'click',
             this.onToggleShadersButtonClicked.bind(this)
+        );
+
+        this.getElement('animate-btn').addEventListener(
+            'click',
+            this.onAnimateButtonClicked.bind(this)
         );
 
         Control.ELEMENT_IDS.forEach((id) => {
@@ -136,27 +121,6 @@ export class Control {
                 const element: keyof VecBool3 = id.replace('auto-rotation-', '') as keyof VecBool3;
                 const status: boolean = (ev.target as HTMLInputElement).checked;
                 this.autoRotation[element] = status;
-                // if (status) {
-                //     Control.CHECKBOX_IDS.forEach((xid) => {
-                //         if (id !== xid) {
-                //             const elementX: keyof VecBool3 = xid.replace(
-                //                 'auto-rotation-',
-                //                 ''
-                //             ) as keyof VecBool3;
-                //             this.getElement(xid).checked = false;
-                //             this.autoRotation[elementX] = false;
-                //         }
-                //     });
-                // } else {
-                //     Control.CHECKBOX_IDS.forEach((xid) => {
-                //         const elementX: keyof VecBool3 = xid.replace(
-                //             'auto-rotation-',
-                //             ''
-                //         ) as keyof VecBool3;
-                //         this.getElement(xid).checked = false;
-                //         this.autoRotation[elementX] = false;
-                //     });
-                // }
             });
         });
     }
@@ -181,46 +145,6 @@ export class Control {
         this.far = this.getNumber('far');
     }
 
-    private onModelFileLoaded(): void {
-        const fileInput = this.getElement('model-file');
-
-        if (!fileInput.files) {
-            return;
-        }
-
-        const data = fileInput.files[0];
-
-        if (!data) {
-            alert('File is not found.');
-            return;
-        }
-
-        const reader = new FileReader();
-        const fileName = data.name.replace('.json', '').toLowerCase();
-        reader.onload = (e) => {
-            var result: any = {};
-            try {
-                result = JSON.parse((e.target as FileReader).result as string);
-            } catch (e) {
-                alert('Failed to parse file as JSON.');
-                return;
-            }
-            if (!result) {
-                return;
-            }
-
-            const [loaded, fixedFileName] = ModelManager.loadFromFile(fileName, result);
-            if (loaded) {
-                this.onInputChanged();
-                this.modelControl.add(fixedFileName);
-                this.rawModel = false;
-                this.getElement('clear-btn').disabled = this.rawModel;
-            }
-        };
-
-        reader.readAsText(data);
-    }
-
     private onProjectionModeButtonClicked(mode: ProjectionMode): (e: MouseEvent) => void {
         return (e: MouseEvent): void => {
             this.projectionMode = mode;
@@ -232,6 +156,12 @@ export class Control {
     private onToggleShadersButtonClicked(e: MouseEvent): void {
         this.useShader = !this.useShader;
         this.onInputChanged();
+        e.preventDefault();
+    }
+
+    private onAnimateButtonClicked(e: MouseEvent): void {
+        this.onInputChanged();
+        this.animate = !this.animate;
         e.preventDefault();
     }
 
@@ -258,6 +188,7 @@ export class Control {
         this.setNumber('y-light', Control.ROTATION_DEFAULT_VALUE);
         this.setNumber('z-light', Control.ROTATION_DEFAULT_VALUE);
         this.useShader = true;
+        this.animate = true;
 
         this.animation.reset();
 
@@ -274,7 +205,11 @@ export class Control {
         this.getElement(elementId).valueAsNumber = value;
     }
 
+    private dummy: HTMLInputElement = document.createElement('button') as HTMLInputElement;
     private getElement(elementId: string): HTMLInputElement {
+        if (document.getElementById(elementId) == null) {
+            return this.dummy;
+        }
         return document.getElementById(elementId) as HTMLInputElement;
     }
 }
