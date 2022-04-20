@@ -1,54 +1,61 @@
+#extension GL_OES_standard_derivatives : enable
 precision mediump float;
 
-varying vec3 normalInterp;  // Surface normal
-varying vec3 vertPos;       // Vertex position
-varying vec4 v_color;
-uniform int mode;           // Rendering mode
-uniform int shading;
-uniform float Ka;           // Ambient reflection coefficient
-uniform float Kd;           // Diffuse reflection coefficient
-uniform float Ks;           // Specular reflection coefficient
-uniform float shininessValue; // Shininess
+varying highp vec2 vTextureCoord;
+varying highp vec3 vLighting;
+varying vec3 fragColor;
 
-// Material Color
-uniform vec3 ambientColor;
-uniform vec3 diffuseColor;
-uniform vec3 specularColor;
+varying vec3 fmNorm;
+varying vec3 fmWorldPos;
 
-uniform vec3 lightPos; // Light Position
+uniform sampler2D uSampler;
+uniform samplerCube uSamplerCube;
+
+uniform bool stateShade;
+uniform int mode;
+uniform bool textureOn;
 
 void main() {
-    vec3 N = normalize(normalInterp);
-    vec3 L = normalize(lightPos - vertPos);
+    if (textureOn) {
+        if (stateShade) {
+            if (mode == 0) {
+                highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+                gl_FragColor = vec4(texelColor.rgb * vLighting.xyz, texelColor.a);
+            } else if (mode == 1) {
+                vec3 albedo = texture2D(uSampler, vTextureCoord).rgb;
 
-  // Lambert's cosine law
-    float lambertian = max(dot(N, L), 0.0);
-    float specular = 0.0;
-    if (lambertian > 0.0) {
-        vec3 R = reflect(-L, N);      // Light Reflection Vector
-        vec3 V = normalize(-vertPos); // Direction Vector to Viewer
-    
-        float specAngle = max(dot(R, V), 0.0); // Compute the specular term
-        specular = pow(specAngle, shininessValue);
-    }
-    if (shading == 1){
-        gl_FragColor = vec4(Ka * ambientColor + Kd * lambertian * diffuseColor + Ks * specular * specularColor + vec3(v_color), 1.0);
+                vec3 norm = normalize(albedo * 2.0 - 1.0);
+                float diffuse = max(dot(vLighting, norm), 0.0);
+                gl_FragColor = vec4(diffuse * albedo, 1.0);
+            } else if (mode == 2) {
+                vec3 worldNormal = normalize(fmNorm);
+                vec3 eyeToSurfaceFaceDir = normalize(fmWorldPos - vec3(0, 0, 0));
+                vec3 direction = reflect(eyeToSurfaceFaceDir, worldNormal);
+                
+                gl_FragColor = vec4(vec4(textureCube(uSamplerCube, direction)).rgb * vLighting.xyz, 1);
+            }
+        } else {
+            if (mode == 0) {
+                highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+                gl_FragColor = vec4(texelColor.rgb * vec3(1, 1, 1), texelColor.a);
+            } else if (mode == 1) {
+                vec3 albedo = texture2D(uSampler, vTextureCoord).rgb;
 
-        // only ambient
-        if(mode == 2) {
-            gl_FragColor = vec4(Ka * ambientColor, 1.0);
-        }
-
-        // only diffuse
-        if(mode == 3) {
-            gl_FragColor = vec4(Kd * lambertian * diffuseColor, 1.0);
-        }
-
-        // only specular
-        if(mode == 4) {
-            gl_FragColor = vec4(Ks * specular * specularColor, 1.0);
+                vec3 norm = normalize(albedo * 2.0 - 1.0);
+                gl_FragColor = vec4(albedo, 1.0);
+            } else if (mode == 2) {
+                vec3 worldNormal = normalize(fmNorm);
+                vec3 eyeToSurfaceFaceDir = normalize(fmWorldPos - vec3(0, 0, 0));
+                vec3 direction = reflect(eyeToSurfaceFaceDir, worldNormal);
+                
+                gl_FragColor = textureCube(uSamplerCube, direction);
+            }
         }
     } else {
-        gl_FragColor = vec4(vec3(v_color), 1.0);
+        if (stateShade) {
+            gl_FragColor = vec4(fragColor * vLighting, 1.0);
+        } else {
+            gl_FragColor = vec4(fragColor, 1.0);
+        }
     }
 }

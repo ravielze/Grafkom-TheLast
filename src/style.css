@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+input[type='range'] {
+    accent-color: #a3e635;
+}
+
+input[type='checkbox'] {
+    accent-color: #bef264;
+}
