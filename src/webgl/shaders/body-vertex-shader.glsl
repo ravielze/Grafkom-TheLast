@@ -1,19 +1,58 @@
-attribute vec3 a_position;
-attribute vec3 normal;
-attribute vec4 a_color;
+precision highp float;
+attribute vec3 vertPosition;
+attribute vec2 vertTexture;
+attribute vec3 vertNormal;
+attribute vec3 vertTangent;
+attribute vec3 vertBitangent;
+attribute vec3 vertColor;
 
-uniform mat4 u_matrix;
-uniform mat4 u_proj_matrix;
-uniform mat4 normalMat;
+varying vec2 vTextureCoord;
+varying vec3 fragColor;
+varying highp vec3 vLighting;
+varying vec3 L;
 
-varying vec3 normalInterp;
-varying vec3 vertPos;
-varying vec4 v_color;
+varying vec3 fmNorm;
+varying vec3 fmWorldPos;
+
+uniform mat4 mWorld;
+uniform mat4 mView;
+uniform mat4 mProj;
+uniform mat4 mNorm;
+
+uniform mat3 mBump;
+
+mat3 transpose(in mat3 inMatrix) {
+    vec3 i0 = inMatrix[0];
+    vec3 i1 = inMatrix[1];
+    vec3 i2 = inMatrix[2];
+
+    mat3 outMatrix = mat3(
+        vec3(i0.x, i1.x, i2.x),
+        vec3(i0.y, i1.y, i2.y),
+        vec3(i0.z, i1.z, i2.z)
+    );
+
+    return outMatrix;
+}
 
 void main() {
-    vec4 vertPos4 = u_matrix * vec4(a_position, 1.0);
-    vertPos = vec3(vertPos4) / vertPos4.w;
-    normalInterp = vec3(normalMat * vec4(normalize(normal), 0.0));
-    gl_Position = u_proj_matrix * vertPos4;
-    v_color = a_color;
+    fragColor = vertColor;
+    vTextureCoord = vertTexture;
+    vec4 worldPos = mWorld * vec4(vertPosition, 1.0);
+    gl_Position = mProj * mView * worldPos;
+
+    fmWorldPos = vec3(worldPos);
+    fmNorm = mat3(mWorld) * vertNormal;
+
+    highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
+    highp vec3 directionalLightColor = vec3(1, 1, 1);
+    highp vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
+    highp vec4 transformedNormal = mNorm * vec4(vertNormal, 1);
+    highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+    vLighting = ambientLight + (directionalLightColor * directional);
+
+    vec3 N = normalize(mBump*cross(vertBitangent, vertTangent));
+    vec3 T = normalize(mBump*vertTangent);
+    vec3 B = normalize(mBump*vertBitangent);
+    mat3 tbn = mat3(T, B, N);
 }

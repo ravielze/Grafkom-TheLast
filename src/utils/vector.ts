@@ -17,7 +17,7 @@ export default class Vector {
 
     public static normalize(v: Vector3): Vector3 {
         const d = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-        return d !== 0 ? v.map((oldVal) => oldVal / d) : [0, 0, 0];
+        return d > 0 ? v.map((oldVal) => oldVal / d) : [0, 0, 0];
     }
 
     public static cross(v1: Vector3, v2: Vector3): Vector3 {

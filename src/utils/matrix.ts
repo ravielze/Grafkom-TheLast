@@ -1,6 +1,7 @@
 import Vector, { Vector3 } from './vector';
 
 export type Matrix4 = number[];
+export type Matrix3 = number[];
 
 export default class Matrix {
     public static multiply(m1: Matrix4, m2: Matrix4): Matrix4 {
@@ -107,6 +108,18 @@ export default class Matrix {
             for (var j = 0; j < 4; j++) {
                 result[i * 4 + j] = m[i + j * 4];
                 result[i + j * 4] = m[i * 4 + j];
+            }
+        }
+        return result;
+    }
+
+    public static identity(): Matrix4 {
+        const result = Array(16).fill(0);
+        for (var i = 0; i < 4; i++) {
+            for (var j = 0; j < 4; j++) {
+                if (i == j) {
+                    result[i * 4 + j] = 1;
+                }
             }
         }
         return result;

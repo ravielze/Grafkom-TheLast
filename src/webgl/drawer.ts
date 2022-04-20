@@ -6,27 +6,23 @@ import TransformationMatrix from '../utils/transformation-matrix';
 import Vector, { Vector3 } from '../utils/vector';
 
 export class Drawer {
-    public matrix: Matrix4 = Array(16).fill(0);
-    public cameraMatrix: Matrix4 = Array(16).fill(0);
-    public projMatrix: Matrix4 = Array(16).fill(0);
-
     constructor(private readonly control: Control) {}
 
-    public calculateTransformation(): void {
-        const { x: x1, y: y1, z: z1 } = this.control.rotation;
-        const { x: x2, y: y2, z: z2 } = this.control.animation.rotation;
-        const inputPlusAnimation: Vec3 = {
-            x: x1 + x2,
-            y: y1 + y2,
-            z: z1 + z2,
-        };
+    // public calculateTransformation(): void {
+    //     const { x: x1, y: y1, z: z1 } = this.control.rotation;
+    //     const { x: x2, y: y2, z: z2 } = this.control.animation.rotation;
+    //     const inputPlusAnimation: Vec3 = {
+    //         x: x1 + x2,
+    //         y: y1 + y2,
+    //         z: z1 + z2,
+    //     };
 
-        const rotation = TransformationMatrix.getRotationMatrix(inputPlusAnimation);
-        const translation = TransformationMatrix.getTranslationMatrix(this.control.translation);
-        const scale = TransformationMatrix.getScaleMatrix(this.control.scale);
-        this.matrix = Matrix.multiply(rotation, translation);
-        this.matrix = Matrix.multiply(this.matrix, scale);
-    }
+    //     const rotation = TransformationMatrix.getRotationMatrix(inputPlusAnimation);
+    //     const translation = TransformationMatrix.getTranslationMatrix(this.control.translation);
+    //     const scale = TransformationMatrix.getScaleMatrix(this.control.scale);
+    //     this.matrix = Matrix.multiply(rotation, translation);
+    //     this.matrix = Matrix.multiply(this.matrix, scale);
+    // }
 
     // NOTE Rusak!!! males benerin
     // public calculateNormal(model: Model): Float32Array {
@@ -69,51 +65,51 @@ export class Drawer {
     //     return new Float32Array(result);
     // }
 
-    public calculateCameraProjection(): void {
-        var cameraPosition: Vector3 = [0, 0, this.control.cameraDistance];
-        var targetPosition = [0, 0, 0];
+    // public calculateCameraProjection(): void {
+    //     var cameraPosition: Vector3 = [0, 0, this.control.cameraDistance];
+    //     var targetPosition = [0, 0, 0];
 
-        const xRotMat = TransformationMatrix.getRotationMatrix({
-            x: this.control.cameraRotation.y,
-            y: 0,
-            z: 0,
-        });
-        const forwardVectorX = [...cameraPosition, 1];
-        cameraPosition = Vector.add(Vector.transform(xRotMat, forwardVectorX), targetPosition);
+    //     const xRotMat = TransformationMatrix.getRotationMatrix({
+    //         x: this.control.cameraRotation.y,
+    //         y: 0,
+    //         z: 0,
+    //     });
+    //     const forwardVectorX = [...cameraPosition, 1];
+    //     cameraPosition = Vector.add(Vector.transform(xRotMat, forwardVectorX), targetPosition);
 
-        const yRotMat = TransformationMatrix.getRotationMatrix({
-            x: 0,
-            y: this.control.cameraRotation.x,
-            z: 0,
-        });
-        const forwardVectorY = [...cameraPosition, 1];
-        cameraPosition = Vector.add(Vector.transform(yRotMat, forwardVectorY), targetPosition);
+    //     const yRotMat = TransformationMatrix.getRotationMatrix({
+    //         x: 0,
+    //         y: this.control.cameraRotation.x,
+    //         z: 0,
+    //     });
+    //     const forwardVectorY = [...cameraPosition, 1];
+    //     cameraPosition = Vector.add(Vector.transform(yRotMat, forwardVectorY), targetPosition);
 
-        this.cameraMatrix = Matrix.getLookAtMatrix(cameraPosition, targetPosition);
+    //     this.cameraMatrix = Matrix.getLookAtMatrix(cameraPosition, targetPosition);
 
-        const invCameraMatrix = Matrix.inverse(this.cameraMatrix);
-        switch (this.control.projectionMode) {
-            case ProjectionMode.Perspective:
-                this.projMatrix = Matrix.multiply(
-                    invCameraMatrix,
-                    ProjectionMatrix.getPerspectiveMatrix(this.control.near, this.control.far)
-                );
-                break;
-            case ProjectionMode.Orthographic:
-                this.projMatrix = Matrix.multiply(
-                    invCameraMatrix,
-                    ProjectionMatrix.getOrthographicMatrix()
-                );
-                break;
-            case ProjectionMode.Oblique:
-                const tempMatrix = Matrix.multiply(
-                    invCameraMatrix,
-                    ProjectionMatrix.getOrthographicMatrix()
-                );
-                this.projMatrix = Matrix.multiply(ProjectionMatrix.getObliqueMatrix(), tempMatrix);
-                break;
-            default:
-                throw new Error('Projection Mode not found.');
-        }
-    }
+    //     const invCameraMatrix = Matrix.inverse(this.cameraMatrix);
+    //     switch (this.control.projectionMode) {
+    //         case ProjectionMode.Perspective:
+    //             this.projMatrix = Matrix.multiply(
+    //                 invCameraMatrix,
+    //                 ProjectionMatrix.getPerspectiveMatrix(this.control.near, this.control.far)
+    //             );
+    //             break;
+    //         case ProjectionMode.Orthographic:
+    //             this.projMatrix = Matrix.multiply(
+    //                 invCameraMatrix,
+    //                 ProjectionMatrix.getOrthographicMatrix()
+    //             );
+    //             break;
+    //         case ProjectionMode.Oblique:
+    //             const tempMatrix = Matrix.multiply(
+    //                 invCameraMatrix,
+    //                 ProjectionMatrix.getOrthographicMatrix()
+    //             );
+    //             this.projMatrix = Matrix.multiply(ProjectionMatrix.getObliqueMatrix(), tempMatrix);
+    //             break;
+    //         default:
+    //             throw new Error('Projection Mode not found.');
+    //     }
+    // }
 }

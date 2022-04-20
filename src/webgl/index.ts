@@ -1,184 +1,195 @@
 import BodyVertexShader from './shaders/body-vertex-shader.glsl';
 import BodyFragmentShader from './shaders/body-fragment-shader.glsl';
-import { Drawer } from './drawer';
-import Matrix from '../utils/matrix';
+import Matrix, { Matrix3, Matrix4 } from '../utils/matrix';
 import { Control } from '../control';
+import TransformationMatrix from '../utils/transformation-matrix';
+import Vector, { Vector3 } from '../utils/vector';
+import ProjectionMatrix from '../utils/projection-matrix';
+import { Dog, DogSkeleton } from '../model/models/dog';
 
 export class WebGL {
-    public gl: WebGLRenderingContext | null = null;
-    public program: WebGLProgram | null = null;
+    public gl: WebGLRenderingContext;
+    public glProgram?: WebGLProgram;
 
-    public vbo: WebGLBuffer | null = null;
-    public wireVbo: WebGLBuffer | null = null;
-    public elementVbo: WebGLBuffer | null = null;
+    public mWorld?: WebGLUniformLocation;
+    public mView?: WebGLUniformLocation;
+    public mProj?: WebGLUniformLocation;
+    public mNorm?: WebGLUniformLocation;
+    public mBump?: WebGLUniformLocation;
+    public mode?: WebGLUniformLocation;
+    public stateShade?: WebGLUniformLocation;
+    public stateTexture?: WebGLUniformLocation;
+    public uSampler?: WebGLUniformLocation;
+    public uSamplerCube?: WebGLUniformLocation;
 
-    public matrixLocation: WebGLUniformLocation | null = null;
-    public projectionMatrixLocation: WebGLUniformLocation | null = null;
-    public normalMatrixLocation: WebGLUniformLocation | null = null;
+    public vertPosition: number = 0;
+    public vertColor: number = 0;
+    public vertNormal: number = 0;
+    public vertTexture: number = 0;
+    public vertTangent: number = 0;
+    public vertBitangent: number = 0;
 
-    public mode: WebGLUniformLocation | null = null;
-    public ka: WebGLUniformLocation | null = null;
-    public kd: WebGLUniformLocation | null = null;
-    public ks: WebGLUniformLocation | null = null;
-    public shineValue: WebGLUniformLocation | null = null;
-    public ambientColor: WebGLUniformLocation | null = null;
-    public diffuseColor: WebGLUniformLocation | null = null;
-    public specularColor: WebGLUniformLocation | null = null;
-    public lightPos: WebGLUniformLocation | null = null;
-    public shadingModeLocation: WebGLUniformLocation | null = null;
-    public colorOffset: number = 0;
-    public normalOffset: number = 0;
-    public normal: Float32Array = new Float32Array([]);
+    public worldMatrix: Matrix4 = Array(16).fill(0);
+    public cameraMatrix: Matrix4 = Array(16).fill(0);
+    public projMatrix: Matrix4 = Array(16).fill(0);
+    public normMatrix: Matrix4 = Array(16).fill(0);
+    public normBumpMatrix: Matrix3 = Array(9).fill(0);
+
+    private dogSkeleton?: DogSkeleton;
 
     constructor(
-        gl: WebGLRenderingContext | null,
-        private drawer: Drawer,
-        private readonly control: Control
+        gl: WebGLRenderingContext,
+        //private drawer: Drawer,
+        private readonly control: Control,
+        canvas: HTMLCanvasElement
     ) {
         var glx = gl as WebGLRenderingContext;
-        this.gl = glx;
+
+        glx.viewport(0, 0, canvas.width, canvas.height);
+        glx.clearColor(1.0, 1.0, 1.0, 1.0);
+        glx.clear(glx.COLOR_BUFFER_BIT);
 
         glx.enable(glx.DEPTH_TEST);
-        glx.clearColor(0.0, 0.0, 0.0, 0.0);
 
-        //const normal = ModelManager.getModel('block');
-        // if (!normal) {
-        //     alert('Something went wrong!');
-        //     return;
-        // }
-        //this.normal = new Float32Array(normal.positions);
+        this.gl = glx;
+        if (this.initShaders()) {
+            this.initiate();
+        }
+
+        this.gl = glx;
     }
 
-    public start(): void {
-        this.loadModel();
-        this.initShaders();
-        this.drawer.calculateTransformation();
-        this.drawer.calculateCameraProjection();
-        this.draw();
-    }
-
-    private initShaders(): void {
+    private initiate(): void {
         var gl = this.gl as WebGLRenderingContext;
+        var glp = this.glProgram!;
 
-        // Shaders
-        const vertexShader = gl.createShader(gl.VERTEX_SHADER) as WebGLShader;
-        gl.shaderSource(vertexShader, BodyVertexShader);
-        gl.compileShader(vertexShader);
+        this.vertPosition = gl.getAttribLocation(glp, 'vertPosition');
+        this.vertColor = gl.getAttribLocation(glp, 'vertColor');
+        this.vertNormal = gl.getAttribLocation(glp, 'vertNormal');
+        this.vertTexture = gl.getAttribLocation(glp, 'vertTexture');
+        this.vertTangent = gl.getAttribLocation(glp, 'vertTangent');
+        this.vertBitangent = gl.getAttribLocation(glp, 'vertBitangent');
 
-        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER) as WebGLShader;
-        gl.shaderSource(fragmentShader, BodyFragmentShader);
-        gl.compileShader(fragmentShader);
+        this.mWorld = gl.getUniformLocation(glp, 'mWorld') as WebGLUniformLocation;
+        this.mView = gl.getUniformLocation(glp, 'mView') as WebGLUniformLocation;
+        this.mProj = gl.getUniformLocation(glp, 'mProj') as WebGLUniformLocation;
+        this.mNorm = gl.getUniformLocation(glp, 'mNorm') as WebGLUniformLocation;
+        this.mBump = gl.getUniformLocation(glp, 'mBump') as WebGLUniformLocation;
+        this.mode = gl.getUniformLocation(glp, 'mode') as WebGLUniformLocation;
+        this.stateShade = gl.getUniformLocation(glp, 'stateShade') as WebGLUniformLocation;
+        this.stateTexture = gl.getUniformLocation(glp, 'stateTexture') as WebGLUniformLocation;
+        this.uSampler = gl.getUniformLocation(glp, 'uSampler') as WebGLUniformLocation;
+        this.uSamplerCube = gl.getUniformLocation(glp, 'uSamplerCube') as WebGLUniformLocation;
 
-        this.program = gl.createProgram() as WebGLProgram;
-        gl.attachShader(this.program, vertexShader);
-        gl.attachShader(this.program, fragmentShader);
+        this.initMatrix();
 
-        gl.bindAttribLocation(this.program, 0, 'a_position');
-        gl.bindAttribLocation(this.program, 1, 'normal');
-        gl.bindAttribLocation(this.program, 2, 'a_color');
+        gl.uniform1i(this.stateShade!, this.control.useShader ? 1 : 0);
+        gl.uniform1i(this.stateTexture!, 0);
 
-        gl.linkProgram(this.program);
-        this.matrixLocation = gl.getUniformLocation(this.program, 'u_matrix');
-        this.projectionMatrixLocation = gl.getUniformLocation(this.program, 'u_proj_matrix');
-        this.mode = gl.getUniformLocation(this.program, 'mode');
-        this.shadingModeLocation = gl.getUniformLocation(this.program, 'shading');
-        this.ka = gl.getUniformLocation(this.program, 'Ka');
-        this.kd = gl.getUniformLocation(this.program, 'Kd');
-        this.ks = gl.getUniformLocation(this.program, 'Ks');
-        this.shineValue = gl.getUniformLocation(this.program, 'shininessValue');
-        this.ambientColor = gl.getUniformLocation(this.program, 'ambientColor');
-        this.diffuseColor = gl.getUniformLocation(this.program, 'diffuseColor');
-        this.specularColor = gl.getUniformLocation(this.program, 'specularColor');
-        this.lightPos = gl.getUniformLocation(this.program, 'lightPos');
-        this.normalMatrixLocation = gl.getUniformLocation(this.program, 'normalMat');
-        this.gl = gl;
-    }
+        gl.uniformMatrix4fv(this.mWorld!, false, new Float32Array(this.worldMatrix));
+        gl.uniformMatrix4fv(this.mView!, false, new Float32Array(this.cameraMatrix));
+        gl.uniformMatrix4fv(this.mProj!, false, new Float32Array(this.projMatrix));
+        gl.uniformMatrix4fv(this.mNorm!, false, new Float32Array(this.normMatrix));
+        gl.uniform1i(this.uSampler!, 1);
+        gl.uniform1i(this.uSamplerCube!, 0);
+        gl.uniformMatrix3fv(this.mBump!, false, new Float32Array(this.normBumpMatrix));
 
-    public loadModel(): void {
-        const gl = this.gl as WebGLRenderingContext;
-        // const model = ModelManager.getCurrentModel();
-        // if (!model) {
-        //     return;
-        // }
-
-        this.vbo = gl.createBuffer() as WebGLBuffer;
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-        // gl.bufferData(
-        //     gl.ARRAY_BUFFER,
-        //     model.positions.byteLength + model.colors.byteLength + this.normal.byteLength,
-        //     gl.STATIC_DRAW
-        // );
-        // this.normalOffset = model.positions.byteLength;
-        // this.colorOffset = this.normalOffset + this.normal.byteLength;
-
-        // gl.bufferSubData(gl.ARRAY_BUFFER, 0, model.positions);
-        // gl.bufferSubData(gl.ARRAY_BUFFER, this.normalOffset, this.normal);
-        // gl.bufferSubData(gl.ARRAY_BUFFER, this.colorOffset, model.colors);
-
-        // this.elementVbo = gl.createBuffer();
-        // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.elementVbo);
-        // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, model.indices, gl.STATIC_DRAW);
+        const dog = new Dog();
+        this.dogSkeleton = new DogSkeleton(this, dog);
 
         this.gl = gl;
+        this.glProgram = glp;
+        this.render();
     }
 
-    public draw(): void {
-        const gl = this.gl as WebGLRenderingContext;
-        // const model = ModelManager.getCurrentModel();
-        // if (!model) {
-        //     return;
-        // }
-
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    private render(): void {
+        const gl = this.gl;
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clearDepth(1.0);
         gl.enable(gl.DEPTH_TEST);
-        gl.useProgram(this.program);
+        gl.depthFunc(gl.LEQUAL);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-
-        // Retrieve Positionns
-        gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(0);
-
-        // Retrieve Normals
-        gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, this.normalOffset);
-        gl.enableVertexAttribArray(1);
-
-        // Retrieve Colors
-        gl.vertexAttribPointer(2, 4, gl.FLOAT, false, 0, this.colorOffset);
-        gl.enableVertexAttribArray(2);
-
-        gl.uniformMatrix4fv(this.matrixLocation, false, new Float32Array(this.drawer.matrix));
-        gl.uniformMatrix4fv(
-            this.projectionMatrixLocation,
-            false,
-            new Float32Array(this.drawer.projMatrix)
-        );
-
-        const inversedMatrix = Matrix.inverse(this.drawer.matrix);
-        gl.uniformMatrix4fv(
-            this.normalMatrixLocation,
-            false,
-            new Float32Array(Matrix.transpose(inversedMatrix))
-        );
-
-        gl.uniform1i(this.mode, 1);
-        gl.uniform1i(this.shadingModeLocation, this.control.useShader ? 1 : 0);
-        gl.uniform1f(this.ka, 1);
-        gl.uniform1f(this.kd, 1);
-        gl.uniform1f(this.ks, 1);
-
-        // gl.uniform1f(this.shineValue, model.material.shininess);
-        // gl.uniform3fv(this.ambientColor, new Float32Array(model.material.ambient));
-        // gl.uniform3fv(this.diffuseColor, new Float32Array(model.material.diffuse));
-        // gl.uniform3fv(this.specularColor, new Float32Array(model.material.specular));
-        gl.uniform3fv(
-            this.lightPos,
-            new Float32Array([this.control.light.x, this.control.light.y, this.control.light.z])
-        );
-
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.elementVbo);
-        // gl.drawElements(gl.TRIANGLES, model.indices.length, gl.UNSIGNED_SHORT, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT || gl.DEPTH_BUFFER_BIT);
+        this.dogSkeleton!.draw();
 
         this.gl = gl;
+    }
+
+    private initMatrix(): void {
+        this.worldMatrix = Matrix.identity();
+        var cameraPosition: Vector3 = [0, 0, this.control.cameraDistance];
+        var targetPosition = [0, 0, 0];
+
+        const xRotMat = TransformationMatrix.getRotationMatrix({
+            x: this.control.cameraRotation.y,
+            y: 0,
+            z: 0,
+        });
+        const forwardVectorX = [...cameraPosition, 1];
+        cameraPosition = Vector.add(Vector.transform(xRotMat, forwardVectorX), targetPosition);
+
+        const yRotMat = TransformationMatrix.getRotationMatrix({
+            x: 0,
+            y: this.control.cameraRotation.x,
+            z: 0,
+        });
+        const forwardVectorY = [...cameraPosition, 1];
+        cameraPosition = Vector.add(Vector.transform(yRotMat, forwardVectorY), targetPosition);
+
+        this.cameraMatrix = Matrix.getLookAtMatrix(cameraPosition, targetPosition);
+        this.projMatrix = ProjectionMatrix.getPerspectiveMatrix(
+            this.control.near,
+            this.control.far
+        );
+        this.normMatrix = Matrix.transpose(
+            Matrix.inverse(Matrix.multiply(this.cameraMatrix, this.worldMatrix))
+        );
+
+        const cm = (idx: number): number => this.cameraMatrix[idx];
+
+        //prettier-ignore
+        this.normBumpMatrix = [
+            cm(0), cm(1), cm(2),
+            cm(3), cm(4), cm(5),
+            cm(6), cm(7), cm(8)
+        ]
+    }
+
+    private initShaders(): boolean {
+        var gl = this.gl as WebGLRenderingContext;
+        this.glProgram = gl.createProgram() as WebGLProgram;
+        var glp = this.glProgram;
+
+        const createShader = (source: string, type: number): WebGLShader | null => {
+            const shader = gl.createShader(type) as WebGLShader;
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                return null;
+            }
+            return shader;
+        };
+
+        const vertexShader = createShader(BodyVertexShader, gl.VERTEX_SHADER);
+        const fragmentShader = createShader(BodyFragmentShader, gl.FRAGMENT_SHADER);
+        if (vertexShader == null || fragmentShader == null) {
+            alert('Shader compilation error!');
+            return false;
+        }
+
+        gl.attachShader(glp, vertexShader);
+        gl.attachShader(glp, fragmentShader);
+        gl.linkProgram(glp);
+
+        if (!gl.getProgramParameter(glp, gl.LINK_STATUS)) {
+            alert('Shader program initialization failed!');
+            return false;
+        }
+        gl.useProgram(glp);
+
+        this.glProgram = glp;
+        this.gl = gl;
+        return true;
     }
 }
