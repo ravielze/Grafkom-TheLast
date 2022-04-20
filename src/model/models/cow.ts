@@ -15,7 +15,7 @@ import texture from '../../texture/cow.jpg';
 
 export class CowSkeleton extends Renderer {
     constructor(webGL: WebGL, public cow: Cow) {
-        super(webGL, 1, cow.root!);
+        super(webGL, 0, cow.root!);
     }
 }
 
@@ -45,7 +45,7 @@ export class Cow extends Model {
             this.updateTransform();
         });
 
-        const xCenter = 2;
+        const xCenter = 1;
         const yCenter = 0;
         const scale = 1;
         const cubeSize = 2;
