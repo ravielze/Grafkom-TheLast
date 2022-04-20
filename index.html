@@ -30,10 +30,6 @@
                 <label for="far">far-plane&nbsp;</label>
                 <input id="far" type="range" min="1.05" max="50" value="50" />
             </div>
-            <div class="flex items-center space-x-2 p-1">
-                <label for="camdist">cam-radius</label>
-                <input id="camdist" type="range" min="0" max="10" step="0.05" value="2" />
-            </div>
         </div>
         <!-- <div>
             <div class="flex items-center space-x-2 p-1">
@@ -65,20 +61,6 @@
         </div>
         <div>
             <div class="flex items-center space-x-2 p-1">
-                <label for="x-scale">x-scale</label>
-                <input id="x-scale" type="range" min="0.1" max="3" step="0.1" value="1" />
-            </div>
-            <div class="flex items-center space-x-2 p-1">
-                <label for="y-scale">y-scale</label>
-                <input id="y-scale" type="range" min="0.1" max="3" step="0.1" value="1" />
-            </div>
-            <div class="flex items-center space-x-2 p-1">
-                <label for="z-scale">z-scale</label>
-                <input id="z-scale" type="range" min="0.1" max="3" step="0.1" value="1" />
-            </div>
-        </div>
-        <div>
-            <div class="flex items-center space-x-2 p-1">
                 <label for="x-translation">x-translation</label>
                 <input id="x-translation" type="range" min="-3" max="3" step="0.1" value="0" />
             </div>
@@ -93,14 +75,6 @@
         </div>
         <div>
             <div class="flex items-center space-x-2 p-1">
-                <label for="x-camrot">x-cam-rot</label>
-                <input id="x-camrot" type="range" min="-90" max="90" step="1" value="0" />
-            </div>
-            <div class="flex items-center space-x-2 p-1">
-                <label for="y-camrot">y-cam-rot</label>
-                <input id="y-camrot" type="range" min="-180" max="180" step="1" value="0" />
-            </div>
-            <div class="flex items-center space-x-2 p-1">
                 <label>auto-rotate</label>
                 <label for="auto-rotation-x">x</label>
                 <input id="auto-rotation-x" type="checkbox" />
@@ -108,6 +82,16 @@
                 <input id="auto-rotation-y" type="checkbox" />
                 <label for="auto-rotation-z">z</label>
                 <input id="auto-rotation-z" type="checkbox" />
+            </div>
+            <div class="flex items-center space-x-2 p-1 justify-center">
+                <button class="rounded py-1 px-2 text-white bg-gray-600 hover:bg-gray-500" id="toggle-shading-btn">
+                    Toggle Shading
+                </button>
+            </div>
+            <div class="flex items-center space-x-2 p-1 justify-center">
+                <button class="rounded py-1 px-2 bg-lime-700 hover:bg-lime-600" id="toggle-texture-btn">
+                    Toggle Texture
+                </button>
             </div>
             <!-- <div class="flex items-center space-x-2 p-1 justify-center">
                 <button
@@ -143,11 +127,6 @@
             </div>
         </div>
         <div class="pl-3">
-            <div class="flex items-center space-x-2 p-1 justify-center">
-                <button class="rounded py-1 px-2 text-white bg-gray-600 hover:bg-gray-500" id="toggle-shading-btn">
-                    Toggle Shading
-                </button>
-            </div>
             <div class="flex items-center space-x-2 p-1 justify-center">
                 <button class="rounded py-1 px-2 text-white bg-pink-600 hover:bg-pink-500" id="reset-btn">
                     Reset

@@ -11,15 +11,16 @@ import { CubeOperation } from '../../cube/operation';
 import DefaultMatrix from '../../utils/default-matrix';
 import { WebGL } from '../../webgl';
 import { NodePoint } from '../node-point';
-import texture from '../../texture/cow.jpg';
+import texture from '../../texture/stone.jpg';
+import { Control } from '../../control';
 
-export class CowSkeleton extends Renderer {
-    constructor(webGL: WebGL, public cow: Cow) {
-        super(webGL, 1, cow.root!);
+export class CatSkeleton extends Renderer {
+    constructor(webGL: WebGL, public cat: Cat) {
+        super(webGL, 1, cat.root!);
     }
 }
 
-export class Cow extends Model {
+export class Cat extends Model {
     public centers: NumberContainer;
     public skeletons: FloatContainer;
     public colors: FloatContainer;
@@ -45,7 +46,7 @@ export class Cow extends Model {
             this.updateTransform();
         });
 
-        const xCenter = 2;
+        const xCenter = 0;
         const yCenter = 0;
         const scale = 1;
         const cubeSize = 2;

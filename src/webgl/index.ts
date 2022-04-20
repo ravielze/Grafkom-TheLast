@@ -4,6 +4,7 @@ import Matrix, { Matrix3, Matrix4 } from '../utils/matrix';
 import { Control } from '../control';
 import ProjectionMatrix from '../utils/projection-matrix';
 import { Cow, CowSkeleton } from '../model/models/cow';
+import { Cat, CatSkeleton } from '../model/models/cat';
 import { Vec3 } from '../types';
 import TransformationMatrix from '../utils/transformation-matrix';
 
@@ -36,6 +37,7 @@ export class WebGL {
     public normBumpMatrix: Matrix3 = Array(9).fill(0);
 
     private cowSkeleton?: CowSkeleton;
+    private catSkeleton?: CatSkeleton;
 
     constructor(
         gl: WebGLRenderingContext,
@@ -84,7 +86,7 @@ export class WebGL {
         this.initMatrix();
         console.log(this.worldMatrix);
 
-        gl.uniform1i(this.stateTexture!, 1);
+        gl.uniform1i(this.stateTexture!, this.control.useTexture ? 1 : 0);
         gl.uniform1i(this.stateShade!, this.control.useShader ? 1 : 0);
 
         gl.uniformMatrix4fv(this.mWorld!, false, new Float32Array(this.worldMatrix));
@@ -95,8 +97,10 @@ export class WebGL {
         gl.uniform1i(this.uSamplerCube!, 0);
         gl.uniformMatrix3fv(this.mBump!, false, new Float32Array(this.normBumpMatrix));
 
-        const cow = new Cow();
+        const cow = new Cow(this.control);
         this.cowSkeleton = new CowSkeleton(this, cow);
+        const cat = new Cat(this.control);
+        this.catSkeleton = new CatSkeleton(this, cat);
 
         this.gl = gl;
         this.glProgram = glp;
@@ -114,6 +118,7 @@ export class WebGL {
         this.calculateWorldMatrix();
         this.calculateToggle();
         this.cowSkeleton!.draw();
+        this.catSkeleton!.draw();
 
         this.gl = gl;
     }
@@ -149,7 +154,9 @@ export class WebGL {
         };
 
         const rotation = TransformationMatrix.getRotationMatrix(inputPlusAnimation);
-        const translation = TransformationMatrix.getTranslationMatrix(this.control.translation);
+        const translation = TransformationMatrix.getTranslationMatrixTranspose(
+            this.control.translation
+        );
         const scale = TransformationMatrix.getScaleMatrix(this.control.scale);
         this.worldMatrix = Matrix.multiply(rotation, translation);
         this.worldMatrix = Matrix.multiply(this.worldMatrix, scale);
@@ -159,6 +166,7 @@ export class WebGL {
 
     public calculateToggle(): void {
         this.gl.uniform1i(this.stateShade!, this.control.useShader ? 1 : 0);
+        this.gl.uniform1i(this.stateTexture!, this.control.useTexture ? 1 : 0);
     }
 
     private initShaders(): boolean {
