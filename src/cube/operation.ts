@@ -1,6 +1,5 @@
 import { Vec3 } from '../types';
 import DefaultMatrix, { DefMatrix } from '../utils/default-matrix';
-import { Matrix4 } from '../utils/matrix';
 import TransformationMatrix from '../utils/transformation-matrix';
 import Vector from '../utils/vector';
 
