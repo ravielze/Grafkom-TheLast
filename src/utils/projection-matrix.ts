@@ -2,8 +2,8 @@ import { Matrix4 } from './matrix';
 import Utils from './other';
 
 export default class ProjectionMatrix {
-    private static readonly FOV: number = 60;
-    private static readonly ASPECT: number = 1;
+    private static readonly FOV: number = 45;
+    private static readonly ASPECT: number = 1500 / 1000;
 
     private static readonly MIN_DISTANCE_VAL: number = 0.05;
     private static readonly MAX_DISTANCE_VAL: number = 50;
@@ -14,16 +14,15 @@ export default class ProjectionMatrix {
     public static getPerspectiveMatrix(near: number, far: number): Matrix4 {
         const a = 1 / Math.tan(Utils.degreesToRadians(ProjectionMatrix.FOV / 2));
         const a2 = a / ProjectionMatrix.ASPECT;
-        const b = far - near;
-        const c = -(near + far) / b;
-        const d = (-2 * near * far) / b;
+        const c = (far + near) / (near - far);
+        const b = (2 * near * far) / (near - far);
 
         //prettier-ignore
         return [
             a2, 0, 0, 0,
             0, a, 0, 0,
-            0, 0, c, d,
-            0, 0, -1, 0
+            0, 0, c, -1,
+            0, 0, b, 0
         ];
     }
 

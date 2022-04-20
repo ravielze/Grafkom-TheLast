@@ -19,7 +19,7 @@ uniform mat4 mView;
 uniform mat4 mProj;
 uniform mat4 mNorm;
 
-uniform mat3 mBump;
+uniform mat3 normalMatrix;
 
 mat3 transpose(in mat3 inMatrix) {
     vec3 i0 = inMatrix[0];
@@ -51,8 +51,8 @@ void main() {
     highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
     vLighting = ambientLight + (directionalLightColor * directional);
 
-    vec3 N = normalize(mBump*cross(vertBitangent, vertTangent));
-    vec3 T = normalize(mBump*vertTangent);
-    vec3 B = normalize(mBump*vertBitangent);
+    vec3 N = normalize(normalMatrix*cross(vertBitangent, vertTangent));
+    vec3 T = normalize(normalMatrix*vertTangent);
+    vec3 B = normalize(normalMatrix*vertBitangent);
     mat3 tbn = mat3(T, B, N);
 }

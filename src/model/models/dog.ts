@@ -38,7 +38,7 @@ export class Dog extends Model {
 
         const xCenter = 0;
         const yCenter = 0;
-        const scale = 2;
+        const scale = 1;
         const cubeSize = 2;
         const bodySize = [1 / scale, 1 / scale, 3 / scale];
         const neckSize = [1 / scale, 0.4 / scale, 0.1 / scale];
@@ -203,27 +203,27 @@ export class Dog extends Model {
         };
 
         this.colors = {
-            body: new Float32Array(CubeOperation.colorFactory(this.skeletons['body'], 1, 0, 0)),
-            head: new Float32Array(CubeOperation.colorFactory(this.skeletons['head'], 0, 1, 0)),
-            neck: new Float32Array(CubeOperation.colorFactory(this.skeletons['neck'], 0, 0, 1)),
-            tail: new Float32Array(CubeOperation.colorFactory(this.skeletons['tail'], 0, 0, 1)),
+            body: new Float32Array(CubeOperation.colorFactory(this.skeletons['body'], 1, 1, 0)),
+            head: new Float32Array(CubeOperation.colorFactory(this.skeletons['head'], 1, 1, 0)),
+            neck: new Float32Array(CubeOperation.colorFactory(this.skeletons['neck'], 1, 1, 0)),
+            tail: new Float32Array(CubeOperation.colorFactory(this.skeletons['tail'], 1, 1, 0)),
             'ear-left': new Float32Array(
-                CubeOperation.colorFactory(this.skeletons['ear-left'], 0, 0, 1)
+                CubeOperation.colorFactory(this.skeletons['ear-left'], 1, 1, 0)
             ),
             'ear-right': new Float32Array(
-                CubeOperation.colorFactory(this.skeletons['ear-right'], 0, 0, 1)
+                CubeOperation.colorFactory(this.skeletons['ear-right'], 1, 1, 0)
             ),
             'leg-front-left': new Float32Array(
                 CubeOperation.colorFactory(this.skeletons['leg-front-left'], 1, 1, 0)
             ),
             'leg-front-right': new Float32Array(
-                CubeOperation.colorFactory(this.skeletons['leg-front-right'], 1, 0, 1)
+                CubeOperation.colorFactory(this.skeletons['leg-front-right'], 1, 1, 0)
             ),
             'leg-back-left': new Float32Array(
-                CubeOperation.colorFactory(this.skeletons['leg-back-left'], 0, 1, 1)
+                CubeOperation.colorFactory(this.skeletons['leg-back-left'], 1, 1, 0)
             ),
             'leg-back-right': new Float32Array(
-                CubeOperation.colorFactory(this.skeletons['leg-back-right'], 0.5, 0.5, 0.5)
+                CubeOperation.colorFactory(this.skeletons['leg-back-right'], 1, 1, 0)
             ),
         };
 

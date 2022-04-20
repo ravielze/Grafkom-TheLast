@@ -2,8 +2,6 @@ import BodyVertexShader from './shaders/body-vertex-shader.glsl';
 import BodyFragmentShader from './shaders/body-fragment-shader.glsl';
 import Matrix, { Matrix3, Matrix4 } from '../utils/matrix';
 import { Control } from '../control';
-import TransformationMatrix from '../utils/transformation-matrix';
-import Vector, { Vector3 } from '../utils/vector';
 import ProjectionMatrix from '../utils/projection-matrix';
 import { Dog, DogSkeleton } from '../model/models/dog';
 
@@ -46,7 +44,7 @@ export class WebGL {
         var glx = gl as WebGLRenderingContext;
 
         glx.viewport(0, 0, canvas.width, canvas.height);
-        glx.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.clearColor(0, 0, 0, 0);
         glx.clear(glx.COLOR_BUFFER_BIT);
 
         glx.enable(glx.DEPTH_TEST);
@@ -74,24 +72,25 @@ export class WebGL {
         this.mView = gl.getUniformLocation(glp, 'mView') as WebGLUniformLocation;
         this.mProj = gl.getUniformLocation(glp, 'mProj') as WebGLUniformLocation;
         this.mNorm = gl.getUniformLocation(glp, 'mNorm') as WebGLUniformLocation;
-        this.mBump = gl.getUniformLocation(glp, 'mBump') as WebGLUniformLocation;
-        // this.mode = gl.getUniformLocation(glp, 'mode') as WebGLUniformLocation;
+        this.mBump = gl.getUniformLocation(glp, 'normalMatrix') as WebGLUniformLocation;
+        this.mode = gl.getUniformLocation(glp, 'mode') as WebGLUniformLocation;
         this.stateShade = gl.getUniformLocation(glp, 'stateShade') as WebGLUniformLocation;
-        // this.stateTexture = gl.getUniformLocation(glp, 'textureOn') as WebGLUniformLocation;
-        // this.uSampler = gl.getUniformLocation(glp, 'uSampler') as WebGLUniformLocation;
-        // this.uSamplerCube = gl.getUniformLocation(glp, 'uSamplerCube') as WebGLUniformLocation;
+        this.stateTexture = gl.getUniformLocation(glp, 'textureOn') as WebGLUniformLocation;
+        this.uSampler = gl.getUniformLocation(glp, 'uSampler') as WebGLUniformLocation;
+        this.uSamplerCube = gl.getUniformLocation(glp, 'uSamplerCube') as WebGLUniformLocation;
 
         this.initMatrix();
+        console.log(this.worldMatrix);
 
-        gl.uniform1i(this.stateShade!, this.control.useShader ? 1 : 0);
-        //gl.uniform1i(this.stateTexture!, 0);
+        gl.uniform1i(this.stateTexture!, 0);
+        gl.uniform1i(this.stateShade!, 1);
 
         gl.uniformMatrix4fv(this.mWorld!, false, new Float32Array(this.worldMatrix));
         gl.uniformMatrix4fv(this.mView!, false, new Float32Array(this.cameraMatrix));
         gl.uniformMatrix4fv(this.mProj!, false, new Float32Array(this.projMatrix));
         gl.uniformMatrix4fv(this.mNorm!, false, new Float32Array(this.normMatrix));
-        //gl.uniform1i(this.uSampler!, 1);
-        //gl.uniform1i(this.uSamplerCube!, 0);
+        gl.uniform1i(this.uSampler!, 1);
+        gl.uniform1i(this.uSamplerCube!, 0);
         gl.uniformMatrix3fv(this.mBump!, false, new Float32Array(this.normBumpMatrix));
 
         const dog = new Dog();
@@ -104,7 +103,7 @@ export class WebGL {
 
     private render(): void {
         const gl = this.gl;
-        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clearColor(0, 0, 0, 0);
         gl.clearDepth(1.0);
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
@@ -117,26 +116,7 @@ export class WebGL {
 
     private initMatrix(): void {
         this.worldMatrix = Matrix.identity();
-        var cameraPosition: Vector3 = [0, 0, this.control.cameraDistance];
-        var targetPosition = [0, 0, 0];
-
-        const xRotMat = TransformationMatrix.getRotationMatrix({
-            x: this.control.cameraRotation.y,
-            y: 0,
-            z: 0,
-        });
-        const forwardVectorX = [...cameraPosition, 1];
-        cameraPosition = Vector.add(Vector.transform(xRotMat, forwardVectorX), targetPosition);
-
-        const yRotMat = TransformationMatrix.getRotationMatrix({
-            x: 0,
-            y: this.control.cameraRotation.x,
-            z: 0,
-        });
-        const forwardVectorY = [...cameraPosition, 1];
-        cameraPosition = Vector.add(Vector.transform(yRotMat, forwardVectorY), targetPosition);
-
-        this.cameraMatrix = Matrix.getLookAtMatrix(cameraPosition, targetPosition);
+        this.cameraMatrix = Matrix.matLookAt([0, 0, -8], [0, 0, 0], [0, 1, 0]);
         this.projMatrix = ProjectionMatrix.getPerspectiveMatrix(
             this.control.near,
             this.control.far
