@@ -9,10 +9,15 @@ export class AnimationControl {
         z: Control.ROTATION_DEFAULT_VALUE,
     };
 
+    public onAnimateHandlers: ((val: number) => void)[] = [];
+
     constructor(private readonly control: Control) {
         window.requestAnimationFrame(this.tick.bind(this));
     }
 
+    public addAnimationHandler(handler: (val: number) => void) {
+        this.onAnimateHandlers.push(handler);
+    }
     public reset(): void {
         this.rotation = {
             x: Control.ROTATION_DEFAULT_VALUE,
@@ -38,6 +43,10 @@ export class AnimationControl {
         if (z) {
             this.rotation.z += delta;
             this.rotation.z = this.rotation.z % 360;
+        }
+
+        if (this.control.animate) {
+            this.onAnimateHandlers.forEach((x) => x(delta));
         }
 
         this.control.onInputChanged();
