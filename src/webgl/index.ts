@@ -39,7 +39,6 @@ export class WebGL {
 
     constructor(
         gl: WebGLRenderingContext,
-        //private drawer: Drawer,
         private readonly control: Control,
         canvas: HTMLCanvasElement
     ) {
@@ -82,7 +81,6 @@ export class WebGL {
         this.uSamplerCube = gl.getUniformLocation(glp, 'uSamplerCube') as WebGLUniformLocation;
 
         this.initMatrix();
-        console.log(this.worldMatrix);
 
         gl.uniform1i(this.stateTexture!, this.control.useTexture ? 1 : 0);
         gl.uniform1i(this.stateShade!, this.control.useShader ? 1 : 0);
@@ -112,6 +110,7 @@ export class WebGL {
 
         gl.clear(gl.COLOR_BUFFER_BIT || gl.DEPTH_BUFFER_BIT);
         this.calculateWorldMatrix();
+        this.calculateProjection();
         this.calculateToggle();
         this.catSkeleton!.draw();
 
@@ -162,6 +161,14 @@ export class WebGL {
     public calculateToggle(): void {
         this.gl.uniform1i(this.stateShade!, this.control.useShader ? 1 : 0);
         this.gl.uniform1i(this.stateTexture!, this.control.useTexture ? 1 : 0);
+    }
+
+    public calculateProjection(): void {
+        this.projMatrix = ProjectionMatrix.getPerspectiveMatrix(
+            this.control.near,
+            this.control.far
+        );
+        this.gl.uniformMatrix4fv(this.mProj!, false, new Float32Array(this.projMatrix));
     }
 
     private initShaders(): boolean {
