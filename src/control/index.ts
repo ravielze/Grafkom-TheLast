@@ -31,6 +31,7 @@ export class Control {
         z: Control.TRANSLATION_DEFAULT_VALUE,
     };
     public useShader: boolean = true;
+    public useTexture: boolean = true;
     public animate: boolean = true;
     public projectionMode: ProjectionMode = ProjectionMode.Perspective;
 
@@ -96,6 +97,11 @@ export class Control {
             this.onToggleShadersButtonClicked.bind(this)
         );
 
+        this.getElement('toggle-texture-btn').addEventListener(
+            'click',
+            this.onToggleTextureButtonClicked.bind(this)
+        );
+
         this.getElement('animate-btn').addEventListener(
             'click',
             this.onAnimateButtonClicked.bind(this)
@@ -129,18 +135,9 @@ export class Control {
         this.rotation.x = this.getNumber('x-rotation');
         this.rotation.y = this.getNumber('y-rotation');
         this.rotation.z = this.getNumber('z-rotation');
-        this.light.x = this.getNumber('x-light');
-        this.light.y = this.getNumber('y-light');
-        this.light.z = this.getNumber('z-light');
-        this.scale.x = this.getNumber('x-scale');
-        this.scale.y = this.getNumber('y-scale');
-        this.scale.z = this.getNumber('z-scale');
         this.translation.x = this.getNumber('x-translation');
         this.translation.y = this.getNumber('y-translation');
         this.translation.z = this.getNumber('z-translation');
-        this.cameraRotation.x = this.getNumber('x-camrot');
-        this.cameraRotation.y = this.getNumber('y-camrot');
-        this.cameraDistance = this.getNumber('camdist');
         this.near = this.getNumber('near');
         this.far = this.getNumber('far');
     }
@@ -159,6 +156,12 @@ export class Control {
         e.preventDefault();
     }
 
+    private onToggleTextureButtonClicked(e: MouseEvent): void {
+        this.useTexture = !this.useTexture;
+        this.onInputChanged();
+        e.preventDefault();
+    }
+
     private onAnimateButtonClicked(e: MouseEvent): void {
         this.onInputChanged();
         this.animate = !this.animate;
@@ -170,25 +173,15 @@ export class Control {
         this.setNumber('y-rotation', Control.ROTATION_DEFAULT_VALUE);
         this.setNumber('z-rotation', Control.ROTATION_DEFAULT_VALUE);
 
-        this.setNumber('x-scale', Control.SCALE_DEFAULT_VALUE);
-        this.setNumber('y-scale', Control.SCALE_DEFAULT_VALUE);
-        this.setNumber('z-scale', Control.SCALE_DEFAULT_VALUE);
-
         this.setNumber('x-translation', Control.TRANSLATION_DEFAULT_VALUE);
         this.setNumber('y-translation', Control.TRANSLATION_DEFAULT_VALUE);
         this.setNumber('z-translation', Control.TRANSLATION_DEFAULT_VALUE);
 
-        this.setNumber('x-camrot', Control.ROTATION_DEFAULT_VALUE);
-        this.setNumber('y-camrot', Control.ROTATION_DEFAULT_VALUE);
-        this.setNumber('camdist', Control.CAMERA_DISTANCE_DEFAULT_VALUE);
-
         this.setNumber('near', Control.NEAR_DEFAULT_VALUE);
         this.setNumber('far', Control.FAR_DEFAULT_VALUE);
-        this.setNumber('x-light', Control.ROTATION_DEFAULT_VALUE);
-        this.setNumber('y-light', Control.ROTATION_DEFAULT_VALUE);
-        this.setNumber('z-light', Control.ROTATION_DEFAULT_VALUE);
         this.useShader = true;
         this.animate = true;
+        this.useTexture = true;
 
         this.animation.reset();
 

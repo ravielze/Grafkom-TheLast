@@ -12,14 +12,15 @@ import DefaultMatrix from '../../utils/default-matrix';
 import { WebGL } from '../../webgl';
 import { NodePoint } from '../node-point';
 import texture from '../../texture/stone.jpg';
+import { Control } from '../../control';
 
-export class DogSkeleton extends Renderer {
-    constructor(webGL: WebGL, public dog: Dog) {
-        super(webGL, 1, dog.root!);
+export class CatSkeleton extends Renderer {
+    constructor(webGL: WebGL, public cat: Cat) {
+        super(webGL, 1, cat.root!);
     }
 }
 
-export class Dog extends Model {
+export class Cat extends Model {
     public centers: NumberContainer;
     public skeletons: FloatContainer;
     public colors: FloatContainer;
@@ -33,8 +34,17 @@ export class Dog extends Model {
     public bodyLocation: number[];
     public root?: NodePoint;
 
-    constructor() {
+    public catTime: number = 0;
+
+    constructor(private readonly control: Control) {
         super();
+
+        this.control.animation.addAnimationHandler((val: number) => {
+            this.catTime += (val * 0.1) % 360;
+            this.distributeRotation(30 * Math.sin(this.catTime));
+            this.updateAnimation();
+            this.updateTransform();
+        });
 
         const xCenter = 0;
         const yCenter = 0;
@@ -246,8 +256,6 @@ export class Dog extends Model {
                 this.centers['ear-right'][1] - earSize[1] / 2,
                 this.centers['head'][2] + headSize[2] / 2,
             ],
-            // 'ear-left': this.centers['ear-left'],
-            // 'ear-right' : this.centers['ear-right'],
             'leg-front-left': this.centers['leg-front-left'],
             'leg-front-right': this.centers['leg-front-right'],
             'leg-back-left': this.centers['leg-back-left'],
@@ -438,7 +446,7 @@ export class Dog extends Model {
         }
     }
 
-    distributeRotation(val: number) {
+    public distributeRotation(val: number): void {
         this.inRotation['neck']['x'] = val / 2;
         this.inRotation['leg-front-left']['x'] = val;
         this.inRotation['leg-front-right']['x'] = -val;
@@ -449,7 +457,7 @@ export class Dog extends Model {
         this.inRotation['ear-right']['z'] = -val;
     }
 
-    transformModel() {
+    public transformModel(): void {
         this.root!.transform = DefaultMatrix.multiply(
             DefaultMatrix.identity(),
             DefaultMatrix.translate({
@@ -471,7 +479,7 @@ export class Dog extends Model {
         );
     }
 
-    updateAnimation() {
+    public updateAnimation(): void {
         this.root!.L!.baseTransform = DefaultMatrix.rotate(
             { x: this.inRotation['neck']['x'], y: 0, z: 0 },
             {
