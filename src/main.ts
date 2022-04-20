@@ -17,19 +17,3 @@ const wgl = new WebGL(gl as WebGLRenderingContext, control, canvas);
 control.onInputChanged = () => {
     wgl.render();
 };
-// const control: Control = new Control();
-// const drawer: Drawer = new Drawer(control);
-// const webGL: WebGL = new WebGL(gl, drawer, control);
-// control.onInputChanged = () => {
-//     webGL.loadModel();
-//     drawer.calculateCameraProjection();
-//     drawer.calculateTransformation();
-//     webGL.draw();
-// };
-// webGL.start();
-
-// const animation = () => {
-//     console.log('x');
-//     window.requestAnimationFrame(animation);
-// };
-// window.requestAnimationFrame(animation);

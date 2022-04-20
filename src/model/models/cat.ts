@@ -46,9 +46,9 @@ export class Cat extends Model {
             this.updateTransform();
         });
 
-        const xCenter = 0;
+        const xCenter = -1;
         const yCenter = 0;
-        const scale = 1;
+        const scale = 1.25;
         const cubeSize = 2;
         const bodySize = [1 / scale, 1 / scale, 3 / scale];
         const neckSize = [1 / scale, 0.4 / scale, 0.1 / scale];
@@ -369,7 +369,6 @@ export class Cat extends Model {
         this.transformModel();
         this.updateAnimation();
         this.updateTransform();
-        console.log(this.root);
     }
 
     public updateTransform(node: NodePoint = this.root!): void {
